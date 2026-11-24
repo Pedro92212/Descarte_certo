@@ -1,0 +1,1002 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#003d96">
+<meta name="description" content="Descubra como e onde descartar peças e equipamentos eletrônicos.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Descarte Certo App</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: protótipo de app. Moldura de celular no desktop, tela cheia no celular. Três abas: Início, Mapa, Lista. */
+:root {
+  --bg: #eef3f9;
+  --surface: #fafcfe;
+  --fg: #0f1a2b;
+  --muted: #46546b;
+  --line: #cbd6e6;
+  --accent: #003d96;
+  --accent-ink: #ffffff;
+  --fill: #003d96;
+  --sel-bg: #0f1a2b;
+  --sel-ink: #eef3f9;
+  --soft: #e1ecf7;
+  --ok: #12780c;
+  --mid: #946200;
+  --hi: #c8202a;
+  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0a1424; --surface: #11203a; --fg: #e6eef9; --muted: #9fb3d1; --line: #233553;
+    --accent: #35c3f0; --accent-ink: #ffffff; --fill: #168210; --sel-bg: #168210; --sel-ink: #ffffff; --soft: #182c4a; --ok: #5fd35a; --mid: #e0b04e; --hi: #ff8a80;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0a1424; --surface: #11203a; --fg: #e6eef9; --muted: #9fb3d1; --line: #233553;
+  --accent: #35c3f0; --accent-ink: #ffffff; --fill: #168210; --sel-bg: #168210; --sel-ink: #ffffff; --soft: #182c4a; --ok: #5fd35a; --mid: #e0b04e; --hi: #ff8a80;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font: 400 15px/1.5 var(--font-body);
+  display: flex;
+  justify-content: center;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+.skip-link { position: fixed; z-index: 100; top: 8px; left: 8px; transform: translateY(-150%); padding: 12px 16px; border-radius: 10px; background: var(--fill); color: var(--accent-ink); font-weight: 600; text-decoration: none; }
+.skip-link:focus { transform: translateY(0); }
+.sr-only { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
+[hidden] { display: none !important; }
+
+.app { width: 100%; max-width: 420px; height: 100%; display: flex; flex-direction: column; background: var(--surface); overflow: hidden; min-width: 0; }
+@media (min-width: 560px) {
+  .app { height: min(100%, 800px); align-self: center; border: 2px solid var(--fg); border-radius: 28px; }
+}
+.screen { flex: 1; overflow-y: auto; padding: 18px 16px 24px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.app::before { content: ""; flex: none; height: 6px; background: linear-gradient(90deg, #003d96 0 40%, #00b7e8 40% 70%, #1fa31a 70% 100%); }
+.silk { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+/* barra de abas */
+.tabbar { display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid var(--line); background: var(--surface); }
+.tab { background: none; border: 0; padding: 8px 4px 10px; min-height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 500; }
+.tab svg { width: 24px; height: 24px; }
+.tab[aria-current="page"] { color: var(--accent); }
+.tab[aria-current="page"] svg { stroke-width: 2.4; }
+
+/* início */
+.greet h1 { font-size: 1.7rem; line-height: 1.12; letter-spacing: -.01em; }
+.greet p { color: var(--muted); margin-top: 6px; }
+.search { width: 100%; min-height: 48px; font: 500 1rem var(--font-body); color: var(--fg); background: var(--bg); border: 2px solid var(--fg); border-radius: 12px; padding: 13px 14px; }
+.search::placeholder { color: var(--muted); opacity: 1; }
+.search::placeholder { opacity: 1; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .search::placeholder { color: #ffffff; } }
+:root[data-theme="dark"] .search::placeholder { color: #ffffff; }
+.cats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.cat { min-height: 76px; background: var(--soft); border: 0; border-radius: 12px; padding: 14px 6px 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500; text-align: center; min-width: 0; }
+.cat svg { width: 28px; height: 28px; color: var(--accent); }
+.cat[aria-pressed="true"] { background: var(--sel-bg); color: var(--sel-ink); }
+.cat[aria-pressed="true"] svg { color: var(--sel-ink); }
+.list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.list > .full { grid-column: 1 / -1; }
+.prod { background: var(--bg); border: 1.5px solid var(--line); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.prod.in { border-color: var(--accent); }
+.pmain { background: none; border: 0; padding: 0; text-align: left; cursor: pointer; display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.pimg { height: 70px; background: var(--soft); display: grid; place-items: center; color: var(--accent); }
+.pimg svg { width: 34px; height: 34px; }
+.pinfo { padding: 10px 10px 6px; display: flex; flex-direction: column; gap: 8px; }
+.pinfo b { font-weight: 600; font-size: 14px; line-height: 1.25; }
+.pact { padding: 6px 10px 10px; }
+.add { width: 100%; min-height: 44px; background: transparent; color: var(--accent); border: 2px solid var(--accent); border-radius: 10px; font: 600 14px var(--font-body); cursor: pointer; }
+.stepper { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.stepper button { width: 44px; height: 44px; flex: none; border: 0; border-radius: 10px; background: var(--fill); color: var(--accent-ink); font: 600 20px/1 var(--font-body); cursor: pointer; }
+.stepper span { font: 600 15px var(--font-body); min-width: 22px; text-align: center; }
+.stepper.big { justify-content: center; gap: 18px; }
+.stepper.big span { font-size: 16px; min-width: 90px; }
+.cartbar { display: flex; align-items: center; gap: 12px; width: 100%; border: 0; background: var(--fill); color: var(--accent-ink); padding: 12px 16px; cursor: pointer; font: 600 15px var(--font-body); text-align: left; }
+.cartbar .n { background: var(--accent-ink); color: var(--fill); border-radius: 999px; min-width: 26px; height: 26px; display: grid; place-items: center; font-size: 13px; padding: 0 7px; }
+.cartbar .go { margin-left: auto; font-weight: 500; font-size: 14px; }
+.citem { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-top: 1px solid var(--line); }
+.citem:first-child { border-top: 0; }
+.citem .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.citem b { font-weight: 600; }
+.citem small { color: var(--muted); font-size: 13px; }
+.citem .stepper { flex: none; width: 118px; }
+
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 2px; border-top: 1px solid var(--line); background: none; border-left: 0; border-right: 0; border-bottom: 0; width: 100%; text-align: left; cursor: pointer; }
+.row:first-child { border-top: 0; }
+.row .t { display: flex; flex-direction: column; min-width: 0; }
+.row b { font-weight: 600; }
+.row small { color: var(--muted); font-size: 13px; }
+.chev { flex: none; color: var(--muted); }
+
+.risk { display: inline-flex; align-items: center; gap: 6px; font: 500 11px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.risk .pip { width: 8px; height: 8px; border-radius: 2px; background: var(--line); display: inline-block; margin-right: 2px; }
+.risk.r1 { color: var(--ok); } .risk.r1 .pip:nth-child(-n+1) { background: var(--ok); }
+.risk.r2 { color: var(--mid); } .risk.r2 .pip:nth-child(-n+2) { background: var(--mid); }
+.risk.r3 { color: var(--hi); } .risk.r3 .pip:nth-child(-n+3) { background: var(--hi); }
+
+/* item */
+.back { min-height: 44px; align-self: flex-start; background: none; border: 0; padding: 6px 8px 6px 0; display: flex; align-items: center; gap: 4px; color: var(--accent); font-weight: 600; cursor: pointer; }
+.detail h2 { font-size: 1.6rem; line-height: 1.12; margin: 8px 0 10px; }
+.card { background: var(--bg); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.card ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; font: 600 1rem var(--font-body); background: var(--fill); color: var(--accent-ink); border: 0; border-radius: 12px; padding: 14px; cursor: pointer; text-decoration: none; }
+.btn.ghost { background: transparent; color: var(--fg); border: 2px solid var(--fg); }
+
+/* lista */
+.check { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-top: 1px solid var(--line); cursor: pointer; }
+.check:first-of-type { border-top: 0; }
+.check input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--accent); flex: none; }
+.check input:checked + span { color: var(--muted); text-decoration: line-through; }
+.bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s; }
+.x { min-width: 44px; min-height: 44px; background: none; border: 0; color: var(--muted); font-size: 22px; line-height: 1; padding: 4px 8px; cursor: pointer; }
+.empty { color: var(--muted); font-size: 14px; }
+.section-title { display: flex; flex-direction: column; gap: 6px; }
+.section-title h2 { font-size: 1.3rem; }
+.tag { font: 500 11px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.pt { display: flex; flex-direction: column; gap: 6px; padding: 14px 0; border-top: 1px solid var(--line); }
+.pt:first-child { border-top: 0; }
+.pt h3 { font-size: 1.02rem; }
+.pt p { color: var(--muted); font-size: 14px; }
+.pt a { color: var(--accent); }
+.status { font-size: 14px; color: var(--muted); }
+.tema { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; font: 500 13px var(--font-body); color: var(--fg); background: transparent; border: 1.5px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; white-space: nowrap; }
+.tema:hover { border-color: var(--fg); }
+.tema svg { flex: none; }
+.loc { min-height: 64px; display: flex; align-items: flex-start; gap: 12px; width: 100%; text-align: left; background: var(--bg); border: 2px solid transparent; border-radius: 12px; padding: 14px; cursor: pointer; }
+.loc .dot { flex: none; width: 20px; height: 20px; margin-top: 2px; border: 2px solid var(--muted); border-radius: 50%; display: grid; place-items: center; }
+.loc[aria-checked="true"] { border-color: var(--accent); }
+.loc[aria-checked="true"] .dot { border-color: var(--accent); }
+.loc[aria-checked="true"] .dot::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.loc address { font-style: normal; line-height: 1.5; }
+.st { display: inline-block; margin-top: 8px; font: 500 11px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; padding: 5px 8px; border-radius: 6px; border: 1.5px solid currentColor; }
+.st.on { color: var(--ok); }
+.st.off { color: var(--hi); }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.bubbles { display: flex; flex-direction: column; gap: 10px; }
+.bubble { background: var(--soft); border-radius: 18px 18px 18px 4px; padding: 0; }
+.bubble summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; cursor: pointer; font: 600 .98rem/1.35 var(--font-display); }
+.bubble summary::-webkit-details-marker { display: none; }
+.bubble summary::after { content: ""; flex: none; width: 9px; height: 9px; border-right: 2.5px solid var(--accent); border-bottom: 2.5px solid var(--accent); transform: rotate(45deg); transition: transform .2s; margin-top: -4px; }
+.bubble[open] summary::after { transform: rotate(-135deg); margin-top: 4px; }
+.bubble .body { padding: 0 16px 16px; font-size: 14px; color: var(--fg); }
+.bubble .body ul, .bubble .body ol { margin: 8px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+.bubble .body p { color: var(--muted); }
+.parceria { margin-top: auto; padding: 14px 0 2px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: flex-start; gap: 8px; opacity: .85; }
+.parceria img { display: block; object-fit: contain; }
+.parceria .eetepa { height: 20px; width: auto; border-radius: 3px; }
+.parceria .apae { height: 22px; width: 22px; }
+.parceria span { font-size: 10px; color: var(--muted); }
+.loc img { flex: none; object-fit: contain; }
+.loc .logo-e { height: 36px; width: auto; border-radius: 4px; }
+.loc .logo-a { height: 44px; width: 44px; }
+.alerta { background: var(--soft); border-left: 4px solid #00b7e8; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.alerta h2 { font-size: 1.15rem; line-height: 1.2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .alerta .silk { color: var(--ok); } }
+:root[data-theme="dark"] .alerta .silk { color: var(--ok); }
+.alerta p { font-size: 13.5px; color: var(--fg); }
+.mascote { width: 84px; height: 84px; flex: none; display: block; overflow: visible; }
+.mascote.sm { width: 64px; height: 64px; }
+.hero { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.hero h1 { flex: 1; }
+.vazio { display: flex; align-items: center; gap: 12px; }
+.vazio p { flex: 1; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .vazio p { color: #ffffff; } }
+:root[data-theme="dark"] .vazio p { color: #ffffff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mascote { filter: drop-shadow(0 0 1.5px rgba(255,255,255,.6)); } }
+:root[data-theme="dark"] .mascote { filter: drop-shadow(0 0 1.5px rgba(255,255,255,.6)); }
+.card.curio { flex-direction: row; align-items: center; gap: 12px; background: var(--soft); border-left: 4px solid #00b7e8; }
+.card.curio > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.card.curio p { font-size: 14px; }
+.app { position: relative; }
+.toast { position: absolute; left: 12px; right: 12px; bottom: 74px; z-index: 20; background: var(--fg); color: var(--bg); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 6px 24px rgba(0,0,0,.3); font-size: 14px; }
+.toast .row2 { display: flex; gap: 8px; }
+.toast button { flex: 1; min-height: 44px; border-radius: 10px; border: 0; font: 600 14px var(--font-body); cursor: pointer; background: var(--fill); color: var(--accent-ink); }
+.toast button.sec { background: transparent; color: var(--bg); border: 1.5px solid var(--bg); flex: none; padding: 0 14px; }
+.greet .intro { color: var(--muted); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .greet .intro { color: #ffffff; } }
+:root[data-theme="dark"] .greet .intro { color: #ffffff; }
+@media (max-width: 359px) {
+  body { padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+  .screen { padding-left: 12px; padding-right: 12px; gap: 14px; }
+  .cats { gap: 7px; }
+  .cat { padding-left: 4px; padding-right: 4px; font-size: 12px; }
+  .list { gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+@media (forced-colors: active) {
+  .cat[aria-pressed="true"], .loc[aria-checked="true"], .btn, .cartbar { border: 2px solid ButtonText; }
+  :focus-visible { outline: 3px solid Highlight; }
+}
+.greet-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+</style>
+
+<style>
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); color-scheme: light dark; }
+body { margin: 0; }
+img { max-width: 100%; }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#q">Pular para a pesquisa</a>
+<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true" focusable="false">
+  <defs>
+    <clipPath id="m-clip"><rect x="125" y="62" width="150" height="288" rx="60"/></clipPath>
+    <g id="m-pre">
+      <ellipse cx="200" cy="376" rx="80" ry="12" fill="#003d96" opacity=".14"/>
+      <ellipse cx="172" cy="356" rx="27" ry="16" fill="#003d96"/>
+      <ellipse cx="228" cy="356" rx="27" ry="16" fill="#003d96"/>
+    </g>
+    <g id="m-armL-up">
+      <path d="M129 214 C103 206 87 190 81 160" fill="none" stroke="#003d96" stroke-width="15" stroke-linecap="round"/>
+      <circle cx="79" cy="152" r="16" fill="#003d96"/>
+    </g>
+    <g id="m-armL-down">
+      <path d="M129 220 C103 228 89 244 85 266" fill="none" stroke="#003d96" stroke-width="15" stroke-linecap="round"/>
+      <circle cx="84" cy="274" r="16" fill="#003d96"/>
+    </g>
+    <g id="m-armR">
+      <path d="M271 220 C297 228 311 244 315 266" fill="none" stroke="#003d96" stroke-width="15" stroke-linecap="round"/>
+      <circle cx="316" cy="274" r="16" fill="#003d96"/>
+    </g>
+    <g id="m-body">
+      <rect x="170" y="30" width="60" height="42" rx="13" fill="#003d96"/>
+      <rect x="125" y="62" width="150" height="288" rx="60" fill="#00b7e8"/>
+      <g clip-path="url(#m-clip)">
+        <path d="M115 246 Q160 228 200 244 T285 240 V360 H115 Z" fill="#1fa31a"/>
+        <rect x="136" y="96" width="10" height="66" rx="5" fill="#ffffff" opacity=".5"/>
+      </g>
+      <rect x="125" y="62" width="150" height="288" rx="60" fill="none" stroke="#003d96" stroke-width="9"/>
+      <polygon points="208,264 181,306 199,306 191,338 221,293 203,293" fill="#ffffff"/>
+    </g>
+    <g id="m-face-happy">
+      <circle cx="172" cy="146" r="24" fill="#ffffff" stroke="#003d96" stroke-width="5"/>
+      <circle cx="228" cy="146" r="24" fill="#ffffff" stroke="#003d96" stroke-width="5"/>
+      <circle cx="175.5" cy="150" r="12.5" fill="#003d96"/>
+      <circle cx="224.5" cy="150" r="12.5" fill="#003d96"/>
+      <circle cx="180.5" cy="144" r="4.5" fill="#ffffff"/>
+      <circle cx="229.5" cy="144" r="4.5" fill="#ffffff"/>
+      <ellipse cx="148" cy="188" rx="12" ry="8" fill="#ffb3c7" opacity=".95"/>
+      <ellipse cx="252" cy="188" rx="12" ry="8" fill="#ffb3c7" opacity=".95"/>
+      <path d="M181 184 Q200 218 219 184 Z" fill="#003d96" stroke="#003d96" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M191 201 Q200 194 209 201 Q200 210 191 201 Z" fill="#ff8fab"/>
+    </g>
+    <g id="m-face-think">
+      <circle cx="172" cy="146" r="24" fill="#ffffff" stroke="#003d96" stroke-width="5"/>
+      <circle cx="228" cy="146" r="24" fill="#ffffff" stroke="#003d96" stroke-width="5"/>
+      <circle cx="179" cy="140" r="12.5" fill="#003d96"/>
+      <circle cx="235" cy="140" r="12.5" fill="#003d96"/>
+      <circle cx="184" cy="134" r="4.5" fill="#ffffff"/>
+      <circle cx="240" cy="134" r="4.5" fill="#ffffff"/>
+      <path d="M150 110 Q168 100 190 108" fill="none" stroke="#003d96" stroke-width="6" stroke-linecap="round"/>
+      <path d="M212 98 Q232 88 252 100" fill="none" stroke="#003d96" stroke-width="6" stroke-linecap="round"/>
+      <ellipse cx="148" cy="188" rx="12" ry="8" fill="#ffb3c7" opacity=".95"/>
+      <ellipse cx="252" cy="188" rx="12" ry="8" fill="#ffb3c7" opacity=".95"/>
+      <path d="M187 200 Q195 192 203 200 T219 200" fill="none" stroke="#003d96" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="326" cy="84" r="36" fill="#ffffff" stroke="#003d96" stroke-width="6"/>
+      <path d="M313 74 C313 58 339 58 339 74 C339 85 326 86 326 98" fill="none" stroke="#003d96" stroke-width="8" stroke-linecap="round"/>
+      <circle cx="326" cy="111" r="5" fill="#003d96"/>
+    </g>
+    <g id="m-wave"><use href="#m-pre"/><use href="#m-armL-up"/><use href="#m-armR"/><use href="#m-body"/><use href="#m-face-happy"/></g>
+    <g id="m-think"><use href="#m-pre"/><use href="#m-armL-down"/><use href="#m-armR"/><use href="#m-body"/><use href="#m-face-think"/></g>
+  </defs>
+</svg>
+<div class="app">
+  <!-- INÍCIO -->
+  <section class="screen" id="v-home" role="main" aria-label="Início e catálogo de eletrônicos">
+    <div class="greet">
+      <div class="greet-top"><span class="silk">Descarte Certo</span><button id="tema" class="tema" type="button">Tema</button></div>
+      <div class="hero"><svg class="mascote" viewBox="0 0 400 400" aria-hidden="true"><use href="#m-wave"/></svg><h1>O que você quer descartar hoje?</h1></div>
+      <p class="intro" style="font-size:13px;margin-top:8px">Eletrônicos e pequenos eletrodomésticos, como celulares, pilhas, cabos, micro-ondas, TVs pequenas e air fryer. Geladeiras, fogões e máquinas de lavar não estão incluídos.</p>
+    </div>
+    <input id="q" class="search" type="search" placeholder="Digite o que você quer descartar" autocomplete="off" aria-label="Digite o que você quer descartar">
+    <div class="cats" id="cats" role="group" aria-label="Categorias"></div>
+    <div>
+      <p class="silk" id="count" style="margin-bottom:6px" aria-live="polite"></p>
+      <div class="list" id="list"></div>
+    </div>
+
+    <div class="alerta" role="note">
+      <span class="silk">Fique por dentro</span>
+      <h2>O descarte incorreto de lixo eletrônico pode trazer consequências.</h2>
+      <p>O descarte inadequado pode causar danos ao meio ambiente e à saúde. A legislação brasileira estabelece responsabilidades para a destinação correta dos resíduos e prevê sanções para determinadas condutas. Entregue seus eletrônicos em um dos pontos parceiros do projeto.</p>
+    </div>
+
+    <button id="shareapp" class="btn ghost" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.6l6.8-4.2M8.6 13.4l6.8 4.2"/></svg>
+      Compartilhar o app
+    </button>
+
+    <div class="parceria" aria-label="Parceria entre EETEPA Santa Izabel e APAE">
+      <img class="eetepa" id="pl-e" alt="EETEPA Santa Izabel do Pará">
+      <span>em parceria com</span>
+      <img class="apae" id="pl-a" alt="APAE Santa Izabel do Pará">
+    </div>
+  </section>
+
+  <!-- DÚVIDAS -->
+  <section class="screen" id="v-faq" role="main" aria-label="Dúvidas frequentes" hidden>
+    <div class="section-title">
+      <span class="silk">Descarte Certo</span>
+      <h2>Principais dúvidas</h2>
+    </div>
+    <div class="bubbles">
+      <details class="bubble">
+        <summary>Você sabe quais são os principais riscos do descarte incorreto?</summary>
+        <div class="body">
+          <ul>
+            <li><b>Contaminação:</b> pilhas, baterias e lâmpadas têm metais pesados, como chumbo, mercúrio e cádmio, que podem poluir o solo e a água.</li>
+            <li><b>Incêndio:</b> baterias de lítio podem pegar fogo se forem amassadas ou perfuradas, inclusive no caminhão de lixo.</li>
+            <li><b>Saúde:</b> queimar fios e peças libera fumaça tóxica.</li>
+            <li><b>Desperdício:</b> materiais que poderiam voltar à indústria pela reciclagem se perdem no lixo comum.</li>
+            <li><b>Mexer por conta própria:</b> desmontar ou queimar aparelhos para tirar peças libera substâncias tóxicas e pode causar cortes, choques e incêndio. Entregue sempre inteiro.</li>
+            <li><b>Dados pessoais:</b> aparelhos descartados sem apagar as informações podem expor dados seus.</li>
+          </ul>
+        </div>
+      </details>
+      <details class="bubble">
+        <summary>O que a lei diz sobre o descarte incorreto?</summary>
+        <div class="body">
+          <ul>
+            <li><b>Lei nº 12.305/2010 (Política Nacional de Resíduos Sólidos):</b> cria a responsabilidade compartilhada. Fabricantes, importadores, distribuidores, comerciantes e consumidores têm, cada um, deveres no destino correto dos resíduos.</li>
+            <li><b>Logística reversa:</b> a lei obriga fabricantes, importadores, distribuidores e comerciantes a receber de volta produtos como pilhas, baterias, lâmpadas e eletroeletrônicos. O consumidor deve guardar o item corretamente e entregá-lo em um ponto de coleta.</li>
+            <li><b>Decreto nº 10.240/2020:</b> regulamenta a logística reversa de eletroeletrônicos de uso doméstico, ou seja, de pessoas físicas.</li>
+            <li><b>Lei nº 9.605/1998 (Lei de Crimes Ambientais):</b> o descarte de resíduos em desacordo com as regras pode gerar multas e outras sanções, e em casos de poluição pode configurar crime ambiental.</li>
+          </ul>
+          <p style="margin-top:10px">Informação geral para orientar o descarte. Não substitui orientação jurídica.</p>
+        </div>
+      </details>
+      <details class="bubble">
+        <summary>Para onde vai o lixo eletrônico que eu entrego?</summary>
+        <div class="body">
+          <ol>
+            <li><b>Coleta:</b> você entrega o item em um dos pontos de coleta.</li>
+            <li><b>Triagem:</b> os aparelhos são separados por tipo.</li>
+            <li><b>Desmontagem:</b> peças e baterias são retiradas com cuidado.</li>
+            <li><b>Reciclagem:</b> metais, plásticos e vidro voltam à indústria como matéria-prima.</li>
+            <li><b>Destinação segura:</b> o que é perigoso é tratado por empresas especializadas, longe do lixo comum.</li>
+          </ol>
+        </div>
+      </details>
+      <details class="bubble">
+        <summary>Como o projeto surgiu?</summary>
+        <div class="body">
+          <p style="color:var(--fg)">O projeto surgiu de uma parceria entre a turma de Informática de 2026 da EETEPA Santa Izabel e a APAE (Associação de Pais e Amigos dos Excepcionais).</p>
+          <p style="color:var(--fg);margin-top:8px">O Descarte Certo nasceu para ajudar as pessoas a descartar eletrônicos pequenos do jeito certo. Você monta a lista dos itens que quer descartar, escolhe onde entregar e combina com a gente pelo WhatsApp. Hoje, os pontos de entrega são a EETEPA - Escola Técnica de Ensino do Pará, Irmã Albertina Leitão, e a APAE.</p>
+        </div>
+      </details>
+      <div class="card" id="ajuda" style="gap:10px">
+        <h3 style="font-size:1.05rem">Você precisa de ajuda?</h3>
+        <p style="color:var(--muted);font-size:14px">Fale com a gente pelo WhatsApp para tirar dúvidas sobre o descarte do seu aparelho.</p>
+        <a class="btn" href="https://wa.me/559188135217?text=Ol%C3%A1%21%20Preciso%20de%20ajuda%20com%20o%20descarte%20de%20um%20aparelho%20eletr%C3%B4nico.">Chamar no WhatsApp: (91) 8813-5217</a>
+        <button id="copynum" class="btn ghost" type="button">Se não abrir, copie o número</button>
+        <p class="status" id="copynum-ok" aria-live="polite" hidden></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ITEM -->
+  <section class="screen" id="v-item" role="main" aria-label="Detalhes do eletrônico" hidden>
+    <button class="back" id="back" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      Voltar
+    </button>
+    <div class="detail" id="detail"></div>
+  </section>
+
+  <!-- MINHA LISTA -->
+  <section class="screen" id="v-cart" role="main" aria-label="Minha lista de descarte" hidden>
+    <button class="back" id="cartback" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      Voltar
+    </button>
+    <div class="section-title">
+      <span class="silk">Passo 1 de 2</span>
+      <h2>Minha lista de descarte</h2>
+      <p class="status" id="cart-sum"></p>
+    </div>
+    <div id="cart-items"></div>
+    <div class="card" id="cart-warn" hidden></div>
+    <div class="stack">
+      <button id="tochoose" class="btn" type="button">Escolher local de entrega</button>
+      <button id="addmore" class="btn ghost" type="button">Adicionar mais itens</button>
+      <button id="clearcart" class="btn ghost" type="button">Limpar lista</button>
+    </div>
+  </section>
+
+  <!-- MAPA -->
+  <section class="screen" id="v-map" role="main" aria-label="Pontos de entrega" hidden>
+    <button class="back" id="mapback" type="button" hidden>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      Voltar
+    </button>
+    <div class="section-title">
+      <span class="silk" id="map-silk">Ponto de entrega</span>
+      <h2 id="map-h">Onde entregar</h2>
+      <p class="status" id="map-item" hidden></p>
+      <p class="status">A EETEPA e a APAE recebem os mesmos tipos de materiais cadastrados neste aplicativo. Escolha o ponto mais conveniente e combine a entrega pelo WhatsApp.</p>
+    </div>
+    <div class="stack" id="locais" role="radiogroup" aria-label="Local de entrega"></div>
+    <div class="stack" id="loc-actions" hidden>
+      <span class="silk">O que você quer fazer agora?</span>
+      <a id="zap" class="btn" href="#">Combinar entrega pelo WhatsApp</a>
+      <button id="copymsg" class="btn ghost" type="button">Se não abrir, copie a mensagem</button>
+      <p class="status" id="copymsg-ok" aria-live="polite" hidden></p>
+      <a id="mapa" class="btn ghost" href="#">Abrir no mapa</a>
+      <button id="copiar" class="btn ghost" type="button">Copiar endereço</button>
+      <button id="compart" class="btn ghost" type="button" hidden>Compartilhar local</button>
+      <p class="status" id="copiado" aria-live="polite" hidden></p>
+    </div>
+    <button id="verdet" class="btn ghost" type="button" hidden>Editar minha lista</button>
+  </section>
+
+
+  <div id="zaptoast" class="toast" role="status" hidden>
+    <span id="zaptext">O WhatsApp não abriu? Copie a mensagem e envie para (91) 8813-5217.</span>
+    <div class="row2"><button id="toastcopy" type="button">Copiar mensagem</button><button id="toastclose" class="sec" type="button" aria-label="Fechar aviso">Fechar</button></div>
+  </div>
+
+  <button id="cartbar" class="cartbar" type="button" hidden aria-label="Abrir minha lista de descarte">
+    <span class="n" id="cartbar-n">0</span><span>Minha lista de descarte</span><span class="go">Ver lista ›</span>
+  </button>
+
+  <p id="anuncio" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+  <nav class="tabbar" aria-label="Navegação principal">
+    <button class="tab" type="button" data-tab="home" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg>Início
+    </button>
+    <button class="tab" type="button" data-tab="faq">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-.9.6-1.5 1.1-1.5 2.2M12 17h.01"/></svg>Dúvidas
+    </button>
+  </nav>
+</div>
+
+<script>
+var ICONS = {
+  "Portáteis": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg>',
+  "Informática": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/></svg>',
+  "Iluminação": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 00-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0012 3z"/></svg>',
+  "Áudio e vídeo": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="1.5"/><path d="M8 21h8M12 17v4"/></svg>',
+  "Eletrodomésticos": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="1.5"/><rect x="6" y="9" width="8" height="6" rx="1"/><path d="M17 10h.01M17 14h.01"/></svg>',
+  "Cabos": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v5M16 3v5M6 8h12v3a6 6 0 01-12 0zM12 17v4"/></svg>'
+};
+
+var ITENS = [
+  { nome: "Celular", cat: "Portáteis", risco: 2, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Se ainda funciona, considere doar ou vender.", "Apague os dados, saia das contas e restaure o padrão de fábrica.", "Remova o chip e o cartão de memória.", "Não desmonte: a bateria de lítio pode pegar fogo se for perfurada."], kw: "smartphone telefone iphone android" },
+  { nome: "Pilhas e baterias", cat: "Portáteis", risco: 3, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Guarde em um pote seco até juntar uma quantidade.", "Cubra os polos de baterias de lítio com fita isolante.", "Quem vende deve receber de volta, então pergunte na loja.", "Nunca queime nem jogue no lixo comum."], kw: "pilha bateria alcalina recarregavel" },
+  { nome: "Bateria inchada", cat: "Portáteis", risco: 3, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Pare de usar e de carregar.", "Não perfure, não aperte e não tente abrir.", "Guarde em local seco, ventilado e longe de inflamáveis.", "Avise o ponto de coleta que ela está inchada."], kw: "estufada lítio power bank" },
+  { nome: "Notebook e computador", cat: "Informática", risco: 2, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Se funciona, doe para escola ou projeto de inclusão digital.", "Apague o disco com limpeza segura antes de entregar.", "Entregue a bateria junto, se ela sair."], kw: "pc laptop desktop gabinete" },
+  { nome: "HD e SSD", cat: "Informática", risco: 2, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Discos formatados de forma simples ainda podem ser recuperados.", "Use limpeza segura ou serviço de destruição de dados."], kw: "disco armazenamento" },
+  { nome: "Impressora e cartuchos", cat: "Informática", risco: 2, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Muitos fabricantes recolhem cartuchos usados.", "Embale o cartucho em saco para não vazar.", "Nunca esvazie tinta ou toner na pia ou no lixo."], kw: "toner tinta" },
+  { nome: "Roteador e modem", cat: "Informática", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Equipamento cedido deve ser devolvido à operadora.", "Restaure o padrão de fábrica para apagar a senha do Wi-Fi."], kw: "wifi internet" },
+  { nome: "Mouse e teclado", cat: "Informática", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Junte vários itens pequenos e entregue de uma vez.", "Se funcionam, vale doar."], kw: "periferico webcam pendrive" },
+  { nome: "Lâmpadas", cat: "Iluminação", risco: 3, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["A fluorescente contém mercúrio, e o dano maior ocorre quando quebra.", "Embale na caixa original ou em jornal.", "Se quebrar, ventile o ambiente e recolha com luvas, sem aspirador."], kw: "fluorescente led" },
+  { nome: "Caixa de som e rádio", cat: "Áudio e vídeo", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Retire pilhas e baterias antes de entregar.", "Aparelhos com bateria embutida vão inteiros."], kw: "bluetooth som" },
+  { nome: "Videogame e controles", cat: "Áudio e vídeo", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Consoles que funcionam têm valor, então doe ou venda.", "Retire as pilhas dos controles.", "Desvincule sua conta antes de entregar."], kw: "console playstation xbox nintendo" },
+  { nome: "Cabos e carregadores", cat: "Cabos", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Entregue os cabos inteiros: não descasque nem queime os fios.", "Junte tudo em uma caixa e leve de uma vez."], kw: "fio usb fonte adaptador" },
+  { nome: "Fones de ouvido", cat: "Cabos", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Fones sem fio têm bateria de lítio pequena.", "Entregue junto com cabos e carregadores."], kw: "headphone airpods" },
+  { nome: "Micro-ondas", cat: "Eletrodomésticos", risco: 2, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Se ainda funciona, considere doar ou vender.", "Não abra o aparelho: o capacitor interno pode guardar carga elétrica mesmo desligado da tomada.", "Retire o prato giratório e os acessórios.", "Limpe o interior antes de entregar."], kw: "microondas forno" },
+  { nome: "TV pequena", cat: "Áudio e vídeo", risco: 2, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Se funciona, doe ou venda.", "Não quebre nem abra a tela: TVs de tubo e LCD antigas podem ter chumbo e mercúrio.", "Retire o controle remoto e as pilhas.", "Transporte com cuidado para a tela não rachar."], kw: "televisão televisor monitor tubo lcd led" },
+  { nome: "Air fryer", cat: "Eletrodomésticos", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Se funciona, vale doar ou vender.", "Espere esfriar e limpe bem antes de entregar.", "Retire a cesta e os acessórios.", "Entregue com o cabo de força."], kw: "fritadeira elétrica airfryer" },
+  { nome: "Liquidificador e batedeira", cat: "Eletrodomésticos", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Lave e seque antes de entregar.", "Retire os copos de vidro e entregue separados, bem embalados.", "Se funciona, considere doar."], kw: "mixer processador" },
+  { nome: "Cafeteira e chaleira elétrica", cat: "Eletrodomésticos", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Esvazie e seque o reservatório.", "Retire filtros e jarras de vidro.", "Entregue com o cabo."], kw: "cafeteira elétrica" },
+  { nome: "Ferro de passar", cat: "Eletrodomésticos", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Esvazie o reservatório de água.", "Espere esfriar totalmente.", "Entregue com o cabo."], kw: "passar roupa vapor" },
+  { nome: "Secador e chapinha", cat: "Eletrodomésticos", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Espere esfriar antes de guardar para entrega.", "Entregue com o cabo.", "Se funciona, vale doar."], kw: "cabelo prancha" },
+  { nome: "Ventilador", cat: "Eletrodomésticos", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Desmonte a grade só se for fácil e seguro, ou entregue inteiro.", "Entregue com o cabo.", "Se funciona, considere doar."], kw: "climatizador circulador" },
+  { nome: "Carregador portátil (power bank)", cat: "Portáteis", risco: 3, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Tem bateria de lítio: não amasse, não fure e não abra.", "Se estiver inchado, quente ou com cheiro estranho, pare de usar e avise o ponto de coleta.", "Guarde em local seco e longe de coisas que pegam fogo até entregar.", "Nunca jogue no lixo comum."], kw: "powerbank bateria externa lítio" },
+  { nome: "Tablet", cat: "Portáteis", risco: 2, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Se ainda funciona, considere doar ou vender.", "Apague os dados, saia das contas e restaure o padrão de fábrica.", "Não desmonte: a bateria de lítio pode pegar fogo se for perfurada."], kw: "ipad tablets" },
+  { nome: "Relógio digital e smartwatch", cat: "Portáteis", risco: 2, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Desvincule o relógio da sua conta e restaure o padrão de fábrica.", "Relógios com pilha de botão devem ir a coletor de pilhas.", "Entregue com o carregador, se tiver."], kw: "smartband pulseira pilha botão" },
+  { nome: "Brinquedo eletrônico", cat: "Portáteis", risco: 2, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Retire as pilhas e entregue separadas.", "Se está em bom estado, considere doar.", "Não desmonte para não soltar peças pequenas."], kw: "brinquedo carrinho robô boneca som" },
+  { nome: "Barbeador e escova de dente elétrica", cat: "Portáteis", risco: 2, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Muitos têm bateria recarregável embutida: entregue o aparelho inteiro.", "Não tente abrir para tirar a bateria.", "Entregue com o carregador."], kw: "aparador depilador" },
+  { nome: "Telefone sem fio", cat: "Portáteis", risco: 2, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Entregue o fone e a base juntos.", "As baterias recarregáveis do fone devem ir junto ao coletor.", "Entregue com o carregador, se tiver."], kw: "telefone fixo base" },
+  { nome: "Calculadora", cat: "Informática", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Retire as pilhas ou a bateria e entregue separadas.", "Junte com outros itens pequenos para entregar de uma vez."], kw: "calculadora científica" },
+  { nome: "Controle remoto", cat: "Áudio e vídeo", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Retire as pilhas e entregue separadas.", "Junte com outros itens pequenos para entregar de uma vez."], kw: "controle tv ar condicionado" },
+  { nome: "Câmera digital", cat: "Áudio e vídeo", risco: 2, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Se funciona, doe ou venda.", "Retire o cartão de memória, apague as fotos e guarde o que quiser.", "Retire a bateria e entregue junto ao coletor.", "Entregue com o carregador."], kw: "câmera filmadora gopro" },
+  { nome: "Extensão e filtro de linha", cat: "Cabos", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Entregue inteiro: não descasque nem queime os fios.", "Junte com cabos e carregadores e entregue de uma vez."], kw: "régua benjamim fio elétrico" },
+  { nome: "Luminária e abajur", cat: "Iluminação", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Retire a lâmpada e entregue como lâmpada: ela tem destino próprio.", "Entregue a luminária com o cabo.", "Se funciona, vale doar."], kw: "abajur lustre spot led" },
+  { nome: "Torradeira e sanduicheira", cat: "Eletrodomésticos", risco: 1, destino: "Os dois pontos parceiros do projeto — EETEPA e APAE, em Santa Izabel do Pará — recebem este item. Escolha o local de entrega na próxima etapa e combine a entrega pelo WhatsApp.", dicas: ["Espere esfriar e limpe os farelos antes de entregar.", "Entregue com o cabo.", "Se funciona, considere doar."], kw: "grill pão" }
+];
+
+var CURIOS = {
+  "Celular": "Um celular reúne vários metais e materiais em peças minúsculas e coladas. Só recicladoras especializadas, com equipamento próprio, conseguem separá-los com segurança, por isso o aparelho deve ser entregue inteiro.",
+  "Pilhas e baterias": "Pilhas e baterias podem conter metais pesados, como chumbo e cádmio, que contaminam solo e água quando vão para o lixo comum. Na reciclagem, esses metais são recuperados.",
+  "Bateria inchada": "O inchaço acontece por gases formados dentro da bateria de lítio. É sinal de que ela está danificada, e por isso nunca deve ser perfurada nem apertada.",
+  "Notebook e computador": "As placas de um computador misturam muitos materiais que só uma recicladora consegue separar com segurança, e muitas peças ainda funcionam. Doar um computador que funciona dá a ele uma segunda vida; se não funciona, entregue inteiro.",
+  "HD e SSD": "Formatar um disco de forma simples não apaga tudo: programas de recuperação podem trazer arquivos de volta. Por isso o descarte seguro também protege os seus dados.",
+  "Impressora e cartuchos": "O plástico dos cartuchos leva muito tempo para se decompor. Muitos podem ser remanufaturados e voltar ao uso, e vários fabricantes recolhem os usados.",
+  "Roteador e modem": "Equipamentos devolvidos à operadora muitas vezes são recondicionados e podem voltar a ser usados por outros clientes.",
+  "Mouse e teclado": "Mesmo os periféricos pequenos têm placa eletrônica e plástico que precisam ser separados por quem recicla. Juntar vários e entregar de uma vez, sem desmontar, já ajuda.",
+  "Lâmpadas": "A lâmpada fluorescente tem uma pequena quantidade de mercúrio. Na reciclagem, o vidro, o alumínio e o próprio mercúrio são separados e reaproveitados.",
+  "Caixa de som e rádio": "Os ímãs de muitos alto-falantes usam neodímio, um dos chamados metais de terras raras, cuja extração é complexa. Quem recupera esse material é a recicladora, e não vale a pena abrir o aparelho em casa.",
+  "Videogame e controles": "Consoles antigos que ainda funcionam são muito procurados por colecionadores, então vender ou doar pode ser melhor do que descartar.",
+  "Cabos e carregadores": "O cobre dos fios pode ser reciclado várias vezes, mas só do jeito certo: descascar ou queimar fios em casa libera fumaça tóxica do plástico. Entregue o cabo inteiro.",
+  "Fones de ouvido": "Fones sem fio têm baterias minúsculas de lítio, muitas vezes coladas e difíceis de trocar. Por isso o aparelho inteiro deve ir para um coletor.",
+  "Micro-ondas": "Boa parte do micro-ondas é metal e vidro, que podem ser reciclados. O que exige cuidado é o interior do aparelho, por isso ele deve ser entregue inteiro.",
+  "TV pequena": "Nas TVs de tubo antigas, o vidro da tela contém chumbo, e algumas TVs LCD mais antigas usam lâmpadas com um pouco de mercúrio. Por isso a tela nunca deve ser quebrada.",
+  "Air fryer": "Eletrodomésticos pequenos têm resistências e motores feitos de metais que a reciclagem consegue aproveitar. Esse trabalho é feito pelas recicladoras, por isso entregue o aparelho inteiro, sem desmontar.",
+  "Liquidificador e batedeira": "O motor de um liquidificador tem muito fio enrolado, que as recicladoras separam com máquinas. Abrir o motor em casa pode causar ferimentos, então entregue o aparelho inteiro.",
+  "Cafeteira e chaleira elétrica": "Chaleiras de aço inox são feitas de um material muito reciclável. O plástico e os fios são separados depois pelas recicladoras.",
+  "Ferro de passar": "A base do ferro de passar costuma ser de alumínio ou aço, materiais que a reciclagem aproveita muito bem. Para isso, entregue o ferro inteiro e frio.",
+  "Secador e chapinha": "Secadores e chapinhas têm resistência e fios internos que a reciclagem separa com segurança. E um aparelho que ainda aquece bem pode ser doado antes de ir para a reciclagem.",
+  "Ventilador": "Muitos ventiladores só precisam de limpeza ou da troca de uma peça simples. Vale perguntar em uma assistência antes de descartar.",
+  "Carregador portátil (power bank)": "Power banks só podem viajar na bagagem de mão, nunca na despachada, por causa do risco de incêndio das baterias de lítio. O mesmo cuidado vale para o descarte.",
+  "Tablet": "Tablets e celulares em bom estado podem ser recondicionados e usados por mais anos, o que poupa os recursos gastos para fabricar um aparelho novo.",
+  "Relógio digital e smartwatch": "Pilhas de botão são perigosas se engolidas por crianças: nesse caso, procure atendimento médico imediatamente. Guarde-as longe de crianças pequenas até entregar.",
+  "Brinquedo eletrônico": "Pilhas esquecidas dentro de brinquedos podem vazar e corroer o aparelho. Retirar as pilhas é o primeiro passo do descarte correto.",
+  "Barbeador e escova de dente elétrica": "Muitos aparelhos de cuidado pessoal têm bateria recarregável fixa dentro deles, e por isso entram na conta do lixo eletrônico, mesmo parecendo pequenos.",
+  "Telefone sem fio": "A bateria do telefone sem fio perde capacidade com o tempo. Trocá-la pode devolver o aparelho ao uso, antes de pensar em descartar.",
+  "Calculadora": "Itens pequenos como calculadoras ficam esquecidos em gavetas. Juntar vários e entregar de uma só vez facilita a reciclagem.",
+  "Controle remoto": "O controle remoto em si é plástico e uma pequena placa. A parte que merece mais atenção são as pilhas, que devem ir separadas para o coletor certo.",
+  "Câmera digital": "Formatar o cartão de memória não apaga as fotos de forma definitiva. Retire o cartão e guarde as imagens que quiser antes de entregar a câmera.",
+  "Extensão e filtro de linha": "O filtro de linha tem componentes de proteção que se desgastam com o uso. Um filtro velho pode continuar ligando os aparelhos, mas já não protegê-los tão bem.",
+  "Luminária e abajur": "Luminárias misturam metal, vidro, plástico e fio. Retirar a lâmpada antes de entregar ajuda a separar cada material na reciclagem.",
+  "Torradeira e sanduicheira": "Farelos acumulados podem pegar fogo em torradeiras e sanduicheiras. Limpar bem antes de entregar também é um cuidado de segurança."
+};
+ITENS.forEach(function (it) { it.curio = CURIOS[it.nome] || ""; });
+
+function norm(s) { return (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim(); }
+function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+function load(k, d) { try { var r = localStorage.getItem(k); return r ? JSON.parse(r) : d; } catch (e) { return d; } }
+
+var RISCO = { 1: "Simples", 2: "Cuidado", 3: "Perigoso" };
+function riskHTML(n) { return '<span class="risk r' + n + '"><span><span class="pip"></span><span class="pip"></span><span class="pip"></span></span>' + RISCO[n] + "</span>"; }
+
+var state = { q: "", cat: "", view: "home", from: "home", current: -1, picking: false, loc: -1, cart: load("dc-lista", {}) };
+
+/* minha lista de descarte (sacola) */
+(function () {
+  var c = state.cart, ok = {};
+  if (c && typeof c === "object") ITENS.forEach(function (it) { var q = parseInt(c[it.nome], 10); if (q > 0) ok[it.nome] = Math.min(q, 20); });
+  state.cart = ok;
+})();
+function qtd(idx) { return state.cart[ITENS[idx].nome] || 0; }
+function setQtd(idx, n) {
+  var nm = ITENS[idx].nome;
+  n = Math.max(0, Math.min(20, n));
+  if (n) state.cart[nm] = n; else delete state.cart[nm];
+  store("dc-lista", state.cart);
+  refreshCart();
+  var aviso = document.getElementById("anuncio");
+  if (aviso) aviso.textContent = n > 0 ? nm + " atualizado: " + n + (n === 1 ? " unidade na lista." : " unidades na lista.") : nm + " removido da lista.";
+}
+function cartList() {
+  var out = [];
+  ITENS.forEach(function (it, idx) { var q = state.cart[it.nome]; if (q) out.push({ it: it, idx: idx, q: q }); });
+  return out;
+}
+function cartTotal() { return cartList().reduce(function (a, c) { return a + c.q; }, 0); }
+function mascote(tipo) { return '<svg class="mascote sm" viewBox="0 0 400 400" aria-hidden="true"><use href="#m-' + tipo + '"/></svg>'; }
+function plural(n) { return n + (n === 1 ? " item" : " itens"); }
+function refreshCart() {
+  renderList(); updateCartBar();
+  if (state.view === "cart") renderCart();
+  if (state.view === "item") renderDetailAct();
+}
+function updateCartBar() {
+  var n = cartTotal(), b = document.getElementById("cartbar");
+  b.hidden = !(n > 0 && state.view !== "cart" && state.view !== "map");
+  document.getElementById("cartbar-n").textContent = n;
+}
+function renderCart() {
+  var L = cartList(), n = cartTotal();
+  document.getElementById("cart-sum").textContent = n ? plural(n) + " para descartar" : "Sua lista está vazia.";
+  document.getElementById("cart-items").innerHTML = L.length ? L.map(function (c) {
+    var nm = esc(c.it.nome);
+    return '<div class="citem" data-idx="' + c.idx + '"><span class="t"><b>' + nm + "</b><small>" + esc(c.it.cat) + "</small>" + riskHTML(c.it.risco) + "</span>" +
+      '<div class="stepper"><button type="button" data-dec aria-label="Diminuir ' + nm + '">−</button><span>' + c.q + '</span><button type="button" data-inc aria-label="Aumentar ' + nm + '">+</button></div>' +
+      '<button type="button" class="x" data-rm aria-label="Remover ' + nm + '">×</button></div>';
+  }).join("") : '<div class="vazio">' + mascote("wave") + '<p class="empty">Adicione itens na tela Início para montar sua lista de descarte.</p></div>';
+  var perigo = L.filter(function (c) { return c.it.risco === 3; });
+  var w = document.getElementById("cart-warn");
+  w.hidden = !perigo.length;
+  if (perigo.length) w.innerHTML = '<span class="silk">Atenção</span><p>Sua lista tem itens perigosos (' + perigo.map(function (c) { return esc(c.it.nome); }).join(", ") + "). Leve bem embalados, sem amassar nem furar, e avise no WhatsApp ao combinar a entrega.</p>";
+  resetClear();
+  document.getElementById("tochoose").hidden = !L.length;
+  document.getElementById("clearcart").hidden = !L.length;
+  document.getElementById("addmore").textContent = L.length ? "Adicionar mais itens" : "Escolher itens";
+}
+function msgLista(L) {
+  var linhas = cartList().map(function (c) { return "• " + c.q + "x " + c.it.nome; });
+  return "Olá! Quero combinar a entrega de itens para descarte, pelo app Descarte Certo.\n\nMinha lista (" + plural(cartTotal()) + "):\n" + linhas.join("\n") + "\n\nLocal: " + L.nome + "\n\nQual o melhor dia e horário?";
+}
+function renderDetailAct() {
+  var el = document.getElementById("detail-act"); if (!el) return;
+  var q = qtd(state.current);
+  el.innerHTML = q
+    ? '<div class="stepper big"><button type="button" data-dec aria-label="Diminuir quantidade de ' + esc(ITENS[state.current].nome) + '">−</button><span>' + q + ' na lista</span><button type="button" data-inc aria-label="Aumentar quantidade de ' + esc(ITENS[state.current].nome) + '">+</button></div><button type="button" class="btn" data-act="viewcart">Ver minha lista (' + cartTotal() + ")</button>"
+    : '<button type="button" class="btn" data-act="add">Adicionar à minha lista</button>';
+}
+
+/* navegação */
+var VIEWS = ["home", "faq", "item", "map", "cart"];
+function go(v) {
+  state.view = v;
+  VIEWS.forEach(function (n) { document.getElementById("v-" + n).hidden = (n !== v); });
+  var tab = (v === "item" || v === "map" || v === "cart") ? state.from : v;
+  document.querySelectorAll(".tab").forEach(function (t) {
+    if (t.getAttribute("data-tab") === tab) t.setAttribute("aria-current", "page"); else t.removeAttribute("aria-current");
+  });
+  var el = document.getElementById("v-" + v);
+  if (el) {
+    el.scrollTop = 0;
+    var titulo = el.querySelector("h1, h2");
+    if (titulo) {
+      titulo.setAttribute("tabindex", "-1");
+      window.setTimeout(function () { titulo.focus({ preventScroll: true }); }, 0);
+    }
+  }
+  var nomes = { home: "Início", faq: "Dúvidas frequentes", item: "Detalhes do eletrônico", cart: "Minha lista de descarte", map: "Pontos de entrega" };
+  var aviso = document.getElementById("anuncio");
+  if (aviso) aviso.textContent = "Tela: " + (nomes[v] || v) + ".";
+  if (v === "map") { renderMap(); }
+  if (v === "cart") { renderCart(); }
+  updateCartBar();
+}
+
+/* início */
+document.querySelector(".tabbar").addEventListener("click", function (e) {
+  var b = e.target.closest(".tab"); if (!b) return;
+  state.from = b.getAttribute("data-tab");
+  state.picking = false;
+  go(state.from);
+});
+
+var cats = [];
+ITENS.forEach(function (i) { if (cats.indexOf(i.cat) < 0) cats.push(i.cat); });
+function renderCats() {
+  document.getElementById("cats").innerHTML = cats.map(function (c) {
+    return '<button type="button" class="cat" data-cat="' + esc(c) + '" aria-pressed="' + (c === state.cat) + '">' + ICONS[c] + esc(c) + "</button>";
+  }).join("");
+}
+function renderList() {
+  var q = norm(state.q);
+  if (!q && !state.cat) {
+    document.getElementById("count").textContent = "";
+    document.getElementById("list").innerHTML = '<div class="vazio full">' + mascote("wave") + '<p class="empty">Digite o que você quer descartar ou escolha uma categoria. Toque em Adicionar para montar sua lista de descarte.</p></div>';
+    return;
+  }
+  var list = ITENS.map(function (i, idx) { return { i: i, idx: idx }; }).filter(function (o) {
+    if (state.cat && o.i.cat !== state.cat) return false;
+    if (!q) return true;
+    var hay = norm(o.i.nome + " " + o.i.cat + " " + o.i.kw);
+    return q.split(/\s+/).every(function (w) { return hay.indexOf(w) >= 0; });
+  });
+  document.getElementById("count").textContent = list.length + (list.length === 1 ? " item" : " itens");
+  document.getElementById("list").innerHTML = list.length ? list.map(function (o) {
+    var n = qtd(o.idx), nm = esc(o.i.nome);
+    return '<div class="prod' + (n ? " in" : "") + '" data-idx="' + o.idx + '"><button type="button" class="pmain" data-open aria-label="Ver detalhes de ' + nm + '"><span class="pimg">' + ICONS[o.i.cat] + '</span><span class="pinfo"><b>' + nm + "</b>" + riskHTML(o.i.risco) + "</span></button>" +
+      '<div class="pact">' + (n
+        ? '<div class="stepper"><button type="button" data-dec aria-label="Diminuir ' + nm + '">−</button><span>' + n + '</span><button type="button" data-inc aria-label="Aumentar ' + nm + '">+</button></div>'
+        : '<button type="button" class="add" data-add>+ Adicionar</button>') + "</div></div>";
+  }).join("") : '<div class="vazio full">' + mascote("think") + '<p class="empty">Não recebemos esse item. Na dúvida, não jogue no lixo comum.</p></div>' +
+    '<a class="btn full" href="https://wa.me/559188135217?text=' + encodeURIComponent("Olá! Não achei " + (state.q ? "\"" + state.q.trim() + "\"" : "o meu item") + " no app Descarte Certo. Como posso descartar?") + '">Tem dúvida? Pergunte no WhatsApp</a>';
+}
+document.getElementById("q").addEventListener("input", function (e) { state.q = e.target.value; renderList(); });
+document.getElementById("cats").addEventListener("click", function (e) {
+  var b = e.target.closest(".cat"); if (!b) return;
+  var c = b.getAttribute("data-cat");
+  state.cat = state.cat === c ? "" : c;
+  renderCats(); renderList();
+});
+document.getElementById("list").addEventListener("click", function (e) {
+  var el = e.target.closest("[data-add],[data-inc],[data-dec],[data-open]"); if (!el) return;
+  var card = el.closest(".prod"); if (!card) return;
+  var idx = parseInt(card.getAttribute("data-idx"), 10);
+  if (el.hasAttribute("data-add")) setQtd(idx, 1);
+  else if (el.hasAttribute("data-inc")) setQtd(idx, qtd(idx) + 1);
+  else if (el.hasAttribute("data-dec")) setQtd(idx, qtd(idx) - 1);
+  else openItem(idx);
+});
+
+/* item */
+function openItem(idx) {
+  var i = ITENS[idx]; if (!i) return;
+  state.current = idx;
+  document.getElementById("detail").innerHTML =
+    '<span class="silk">' + esc(i.cat) + "</span>" +
+    "<h2>" + esc(i.nome) + "</h2>" +
+    '<div style="margin-bottom:14px">' + riskHTML(i.risco) + "</div>" +
+    '<div style="display:flex;flex-direction:column;gap:12px">' +
+    '<div class="card"><span class="silk">Onde levar</span><p>' + esc(i.destino) + "</p></div>" +
+    '<div class="card"><span class="silk">Cuidados</span><ul>' + i.dicas.map(function (d) { return "<li>" + esc(d) + "</li>"; }).join("") + "</ul></div>" +
+    (i.curio ? '<div class="card curio">' + mascote("wave") + '<div><span class="silk">Você sabia?</span><p>' + esc(i.curio) + "</p></div></div>" : "") +
+    '<div class="stack" id="detail-act"></div></div>';
+  go("item");
+  renderDetailAct();
+}
+document.getElementById("back").addEventListener("click", function () { go(state.from); });
+document.getElementById("detail").addEventListener("click", function (e) {
+  var el = e.target.closest("[data-act],[data-inc],[data-dec]"); if (!el) return;
+  if (el.getAttribute("data-act") === "add") setQtd(state.current, 1);
+  else if (el.getAttribute("data-act") === "viewcart") go("cart");
+  else if (el.hasAttribute("data-inc")) setQtd(state.current, qtd(state.current) + 1);
+  else if (el.hasAttribute("data-dec")) setQtd(state.current, qtd(state.current) - 1);
+});
+
+/* local de entrega (apenas os já incluídos) */
+var LOGO_E = "data:image/jpeg;base64,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";
+var LOGO_A = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALgAAAC4CAMAAABn7db1AAABgFBMVEXn663b5Nbf4Cq95sLa1Vae1aCKj3fs7p7i395ARD19qoO5ubngrxv//wCftKLBvLH/qv9eYWBhi1p7wYGDwn2x//99foJ3wXq5yqH//38+RECBfoKqqv+//3/Cv1H/qqry9/IAAADo6um0uKrV2dMVFxXY49YGBwb+/v3x+tRtpm3S+dDi5tv7/PXt2xFqmmrm2S2y57K3xK+t2KwlJySSx5Hc4+P3+LHHycXv50/Dx7qTmJJVV1R1d3M1NzSLuIqnqaXo2U7a1y/t521naWbx9+nx4g+LpovutxR0tHWX1ZZHSEYdIRyGiIb395La10z6+G1al1rr6o2487ft4zD2+9H39FPx9tTc3uPd+OL+/rBzhXLZuSnr6c1dm2LmuiYgIh6mqZ3D57tkpF4+QTzaxTVdYFznxjKrtJ3J1rvo59Hm3GhhmVvmykrt7arr7eb8/NRdomPE9bx8p4JcoVxhY11Yi1eCsnu0/7TZ2mmFqXql153h3dukyZsfICCd2KT81FnHAAAAgHRSTlMjF///////6fD//wP/Af//A/////8D//8WA///AwT/A/4A/v/+//7/Bf7///7S///////////+/v7///////////////8t//7////////+////////E/8s//8H//8r///////////////+Gv////8s0f////////8D/////////yJA9bMAACOeSURBVHjaxZ2JY9rGtsZxnKTL7e3d3337k6VhAKEEIxZjdtskFDBe4ySOE9d2HDdb02ZPk7T51993zoyEwBgQSXqnjTcQ+unMd7aREJG5jx/xW2/i6ocdGjPG6fFTHI/F9bPe6Kd/1Ih8NLXCwbedO5fUGAKuH7kSn/Gf/i8Fj9+i/cevxK8Mox0+Lt3YucJb/SP+rwJnq8UJenJsRge83vZfAB4nocbjN8IxB+ivELaast8RXBnsyrTUPvv0Zo9Mix2fDDuBMUrv6qV+H3De1wjqhB6DP48w+xTokU+PvfBkYeEJ/jHxAo9R5GT2KdAjn9zaC1tbW+fPf7G1Bt6FJ/h5ZWvryadHDwc+Bpu517ZW1jFWVkD+ZOsR/fzLF1ujyTX65wKHTcZ4JBt8ffnaPMYSyLceLdGPIF9IjCZnrYcxeiQEdnxu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";
+document.getElementById("pl-e").src = LOGO_E;
+document.getElementById("pl-a").src = LOGO_A;
+var LOCAIS = [
+  { logo: LOGO_E, cls: "logo-e", nome: "EETEPA - ESCOLA TÉCNICA DE ENSINO DO PARÁ, IRMÃ ALBERTINA LEITÃO", linhas: ["R. Antônio Basílio, 125", "Bairro Novo, Santa Izabel do Pará - PA", "CEP 68790-000", "Horário de entrega: segunda a sexta, das 8h às 11h30 e das 13h às 17h", "Fechado aos sábados, domingos e feriados"],
+    addr: "R. Antônio Basílio, 125 - Bairro Novo, Santa Izabel do Pará - PA, 68790-000", tel: "559188135217" },
+  { logo: LOGO_A, cls: "logo-a", nome: "APAE - ASSOCIAÇÃO DE PAIS E AMIGOS DOS EXCEPCIONAIS", linhas: ["R. João Coelho, 625", "Juazeiro", "Horário de entrega: segunda a sexta, das 8h às 11h30", "Fechado aos sábados, domingos e feriados"],
+    addr: "R. João Coelho, 625 - Juazeiro", tel: "559187433285" }
+];
+/* horários (segunda a sexta), em minutos desde 00:00 */
+LOCAIS[0].hor = [[480, 690], [780, 1020]];
+LOCAIS[1].hor = [[480, 690]];
+/* formata 559187433285 como (91) 8743-3285 (número da APAE) */
+function fmtTel(d) { return "(" + d.slice(2, 4) + ") " + d.slice(4, 8) + "-" + d.slice(8); }
+var DIAS = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
+function fmtH(m) { var h = Math.floor(m / 60), mm = m % 60; return h + "h" + (mm ? (mm < 10 ? "0" + mm : mm) : ""); }
+/* feriados em que os locais ficam fechados: nacionais + estadual do Pará (15 de agosto) */
+var FERIADOS = {
+  "1/1": "Confraternização Universal",
+  "21/4": "Tiradentes",
+  "1/5": "Dia do Trabalho",
+  "15/8": "Adesão do Pará à Independência (feriado estadual)",
+  "7/9": "Independência do Brasil",
+  "12/10": "Nossa Senhora Aparecida",
+  "2/11": "Finados",
+  "15/11": "Proclamação da República",
+  "20/11": "Dia da Consciência Negra",
+  "25/12": "Natal"
+};
+function pascoa(y) {
+  var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4,
+      f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30,
+      i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7,
+      m = Math.floor((a + 11 * h + 22 * l) / 451), mes = Math.floor((h + l - 7 * m + 114) / 31),
+      dia = ((h + l - 7 * m + 114) % 31) + 1;
+  return { m: mes, d: dia };
+}
+function feriado(y, mo, d) {
+  var nome = FERIADOS[d + "/" + mo];
+  if (nome) return nome;
+  var p = pascoa(y), sx = new Date(Date.UTC(y, p.m - 1, p.d - 2));
+  if (sx.getUTCMonth() === mo - 1 && sx.getUTCDate() === d) return "Sexta-feira Santa";
+  return null;
+}
+function agoraPA() {
+  var d = new Date(), wd = d.getDay(), mins = d.getHours() * 60 + d.getMinutes(),
+      y = d.getFullYear(), mo = d.getMonth() + 1, da = d.getDate();
+  try {
+    var p = new Intl.DateTimeFormat("en-US", { timeZone: "America/Belem", weekday: "short", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", hour12: false }).formatToParts(d), o = {};
+    p.forEach(function (x) { o[x.type] = x.value; });
+    wd = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(o.weekday);
+    mins = (parseInt(o.hour, 10) % 24) * 60 + parseInt(o.minute, 10);
+    y = parseInt(o.year, 10); mo = parseInt(o.month, 10); da = parseInt(o.day, 10);
+  } catch (e) {}
+  return { wd: wd, mins: mins, y: y, mo: mo, da: da };
+}
+function statusLocal(hor) {
+  var n = agoraPA(), wd = n.wd, m = n.mins, i, off;
+  var fer = feriado(n.y, n.mo, n.da);
+  if (!fer && wd >= 1 && wd <= 5) {
+    for (i = 0; i < hor.length; i++) {
+      if (m >= hor[i][0] && m < hor[i][1]) return { aberto: true, txt: "Aberto agora, fecha às " + fmtH(hor[i][1]) };
+    }
+  }
+  for (off = 0; off <= 14; off++) {
+    var dt = new Date(Date.UTC(n.y, n.mo - 1, n.da + off)), d = dt.getUTCDay();
+    if (d < 1 || d > 5) continue;
+    if (feriado(dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate())) continue;
+    for (i = 0; i < hor.length; i++) {
+      if (off > 0 || hor[i][0] > m) {
+        var quando = off === 0 ? "hoje" : off === 1 ? "amanhã" : DIAS[d];
+        var ini = fer ? "Fechado hoje por causa do feriado: " + fer + ". Abre " : "Fechado agora, abre ";
+        return { aberto: false, txt: ini + quando + " às " + fmtH(hor[i][0]) };
+      }
+    }
+  }
+  return { aberto: false, txt: fer ? "Fechado hoje por causa do feriado: " + fer : "Fechado agora" };
+}
+function startMap() { state.picking = true; state.loc = -1; go("map"); }
+function renderMap() {
+  var picking = state.picking && cartTotal() > 0;
+  if (!picking) state.loc = 0;
+  document.getElementById("mapback").hidden = !picking;
+  document.getElementById("verdet").hidden = !picking;
+  document.getElementById("map-silk").textContent = picking ? "Passo 2 de 2" : "Ponto de entrega";
+  document.getElementById("map-h").textContent = picking ? "Escolha o local de entrega" : "Onde entregar";
+  var mi = document.getElementById("map-item");
+  mi.hidden = !picking;
+  if (picking) mi.textContent = "Sua lista: " + plural(cartTotal()) + " (" + cartList().map(function (c) { return c.q + "x " + c.it.nome; }).join(", ") + ")";
+  document.getElementById("locais").innerHTML = LOCAIS.map(function (l, n) {
+    return '<button type="button" class="loc" role="radio" data-loc="' + n + '" aria-checked="' + (n === state.loc) + '"><span class="dot" aria-hidden="true"></span><img class="' + l.cls + '" src="' + l.logo + '" alt=""><span><b>' + esc(l.nome) + "</b><address>" + l.linhas.map(esc).join("<br>") + "</address>" + (l.hor ? (function () { var st = statusLocal(l.hor); return '<span class="st ' + (st.aberto ? "on" : "off") + '">' + esc(st.txt) + "</span>"; })() : "") + "</span></button>";
+  }).join("");
+  var L = LOCAIS[state.loc];
+  document.getElementById("loc-actions").hidden = !L;
+  if (L) {
+    var txt = picking ? msgLista(L) : "Olá! Quero entregar um aparelho eletrônico na " + L.nome + ". Qual o melhor dia e horário?";
+    var z = document.getElementById("zap");
+    state.lastMsg = txt;
+    z.href = "https://wa.me/" + L.tel + "?text=" + encodeURIComponent(txt);
+    z.textContent = picking ? "Enviar minha lista pelo WhatsApp" : "Combinar entrega pelo WhatsApp";
+    document.getElementById("copymsg-ok").hidden = true;
+    document.getElementById("compart").hidden = !navigator.share;
+    document.getElementById("mapa").href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(L.addr);
+  }
+  document.getElementById("copiado").hidden = true;
+}
+function selecionarLocal(indice) {
+  if (indice < 0 || indice >= LOCAIS.length) return;
+  state.loc = indice;
+  renderMap();
+  var opcoes = document.querySelectorAll("#locais .loc");
+  if (opcoes[indice]) opcoes[indice].focus();
+  var aviso = document.getElementById("anuncio");
+  if (aviso) aviso.textContent = "Ponto selecionado: " + LOCAIS[indice].nome + ".";
+}
+document.getElementById("locais").addEventListener("click", function (e) {
+  var b = e.target.closest(".loc"); if (!b) return;
+  selecionarLocal(parseInt(b.getAttribute("data-loc"), 10));
+});
+document.getElementById("locais").addEventListener("keydown", function (e) {
+  var b = e.target.closest(".loc"); if (!b) return;
+  var atual = parseInt(b.getAttribute("data-loc"), 10);
+  if (e.key === "ArrowDown" || e.key === "ArrowRight") { e.preventDefault(); selecionarLocal((atual + 1) % LOCAIS.length); }
+  else if (e.key === "ArrowUp" || e.key === "ArrowLeft") { e.preventDefault(); selecionarLocal((atual - 1 + LOCAIS.length) % LOCAIS.length); }
+  else if (e.key === "Home") { e.preventDefault(); selecionarLocal(0); }
+  else if (e.key === "End") { e.preventDefault(); selecionarLocal(LOCAIS.length - 1); }
+});
+document.getElementById("mapback").addEventListener("click", function () { go("cart"); });
+document.getElementById("verdet").addEventListener("click", function () { go("cart"); });
+document.getElementById("compart").addEventListener("click", function () {
+  var L = LOCAIS[state.loc]; if (!L) return;
+  var t = (state.picking && cartTotal() ? "Descarte de " + cartList().map(function (c) { return c.q + "x " + c.it.nome; }).join(", ") + " em: " : "Ponto de entrega: ") + L.nome + " - " + L.addr;
+  try { navigator.share({ title: "Descarte Certo", text: t }).catch(function () {}); } catch (e) {}
+});
+
+/* aviso quando o WhatsApp não abre (ex.: arquivo aberto na prévia do iPhone) */
+var zapTimer = null, zapMsg = "", zapNum = "(91) 8813-5217";
+function hideToast() { clearTimeout(zapTimer); document.getElementById("zaptoast").hidden = true; }
+document.addEventListener("click", function (e) {
+  var a = e.target.closest && e.target.closest('a[href^="https://wa.me/"]'); if (!a) return;
+  var m = a.getAttribute("href").match(/[?&]text=([^&]*)/);
+  try { zapMsg = m ? decodeURIComponent(m[1]) : ""; } catch (x) { zapMsg = ""; }
+  var dn = a.getAttribute("href").match(/wa\.me\/(\d{12,13})/);
+  if (dn) zapNum = fmtTel(dn[1]);
+  document.getElementById("zaptext").textContent = "O WhatsApp não abriu? Copie a mensagem e envie para " + zapNum + ".";
+  clearTimeout(zapTimer);
+  zapTimer = setTimeout(function () {
+    if (document.visibilityState === "visible") document.getElementById("zaptoast").hidden = false;
+  }, 2500);
+});
+document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") hideToast(); });
+window.addEventListener("pagehide", hideToast);
+document.getElementById("toastclose").addEventListener("click", hideToast);
+document.getElementById("toastcopy").addEventListener("click", function () {
+  var b = this;
+  copyText(zapMsg || "(91) 8813-5217", function () { b.textContent = "Copiado!"; setTimeout(function () { b.textContent = "Copiar mensagem"; }, 2500); }, function () { b.textContent = "Não foi possível copiar"; });
+});
+
+/* minha lista: ações */
+document.getElementById("cartbar").addEventListener("click", function () { state.picking = false; go("cart"); });
+document.getElementById("cartback").addEventListener("click", function () { state.from = "home"; go("home"); });
+document.getElementById("addmore").addEventListener("click", function () { state.from = "home"; go("home"); });
+document.getElementById("tochoose").addEventListener("click", startMap);
+var clearTimer = null;
+function resetClear() {
+  var b = document.getElementById("clearcart");
+  clearTimeout(clearTimer); b.removeAttribute("data-armed"); b.textContent = "Limpar lista";
+}
+document.getElementById("clearcart").addEventListener("click", function () {
+  var b = this;
+  if (b.getAttribute("data-armed") === "1") { resetClear(); state.cart = {}; store("dc-lista", state.cart); refreshCart(); return; }
+  b.setAttribute("data-armed", "1"); b.textContent = "Toque de novo para limpar tudo";
+  clearTimer = setTimeout(resetClear, 5000);
+});
+document.getElementById("cart-items").addEventListener("click", function (e) {
+  var el = e.target.closest("[data-inc],[data-dec],[data-rm]"); if (!el) return;
+  var row = el.closest(".citem"); if (!row) return;
+  var idx = parseInt(row.getAttribute("data-idx"), 10);
+  if (el.hasAttribute("data-inc")) setQtd(idx, qtd(idx) + 1);
+  else if (el.hasAttribute("data-dec")) setQtd(idx, qtd(idx) - 1);
+  else setQtd(idx, 0);
+});
+document.getElementById("shareapp").addEventListener("click", function () {
+  var url = location.protocol.indexOf("http") === 0 ? location.href.split("#")[0] : "";
+  var texto = "Descarte Certo: veja onde e como descartar eletrônicos do jeito certo em Santa Izabel do Pará.";
+  function zap() { location.href = "https://wa.me/?text=" + encodeURIComponent(texto + (url ? " " + url : "")); }
+  if (navigator.share) {
+    var dados = { title: "Descarte Certo", text: texto };
+    if (url) dados.url = url;
+    navigator.share(dados).catch(function (e) { if (!e || e.name !== "AbortError") zap(); });
+  } else { zap(); }
+});
+function copyText(t, ok, fail) {
+  function legacy() {
+    try {
+      var a = document.createElement("textarea");
+      a.value = t; a.setAttribute("readonly", ""); a.style.cssText = "position:fixed;top:0;left:0;opacity:0;font-size:16px";
+      document.body.appendChild(a); a.focus(); a.select(); a.setSelectionRange(0, t.length);
+      var r = document.execCommand("copy"); document.body.removeChild(a);
+      if (r) ok(); else fail();
+    } catch (e) { fail(); }
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, legacy); else legacy();
+}
+function sayIn(id, t) { var el = document.getElementById(id); el.textContent = t; el.hidden = false; }
+document.getElementById("copiar").addEventListener("click", function () {
+  var L = LOCAIS[state.loc]; if (!L) return;
+  copyText(L.addr, function () { sayIn("copiado", "Endereço copiado."); }, function () { sayIn("copiado", "Não foi possível copiar. Selecione o endereço acima e copie."); });
+});
+document.getElementById("copymsg").addEventListener("click", function () {
+  if (!state.lastMsg) return;
+  var Lm = LOCAIS[state.loc], num = fmtTel(Lm ? Lm.tel : "559188135217");
+  copyText(state.lastMsg, function () { sayIn("copymsg-ok", "Mensagem copiada. Abra o WhatsApp, procure o número " + num + " e cole."); }, function () { sayIn("copymsg-ok", "Não foi possível copiar. Mande a lista manualmente para " + num + "."); });
+});
+document.getElementById("copynum").addEventListener("click", function () {
+  copyText("(91) 8813-5217", function () { sayIn("copynum-ok", "Número copiado. Abra o WhatsApp e cole na busca de contatos."); }, function () { sayIn("copynum-ok", "Não foi possível copiar. O número é (91) 8813-5217."); });
+});
+
+renderCats();
+renderList();
+updateCartBar();
+
+/* tema: automático, claro ou escuro */
+(function () {
+  var KEY = "dc-tema", modes = ["auto", "light", "dark"];
+  var names = { auto: "Auto", light: "Claro", dark: "Escuro" };
+  var icons = {
+    auto: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 000-18z" fill="currentColor"/></svg>',
+    light: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+    dark: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/></svg>'
+  };
+  var btn = document.getElementById("tema"), mode = "auto";
+  if (!btn) return;
+  try { var sv = localStorage.getItem(KEY); if (modes.indexOf(sv) >= 0) mode = sv; } catch (e) {}
+  function apply() {
+    var root = document.documentElement;
+    if (mode === "auto") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", mode);
+    btn.innerHTML = icons[mode] + "<span>" + names[mode] + "</span>";
+    btn.setAttribute("aria-label", "Tema: " + names[mode] + ". Toque para trocar.");
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      var dark = mode === "dark" || (mode === "auto" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      meta.setAttribute("content", dark ? "#0a1424" : "#003d96");
+    }
+  }
+  btn.addEventListener("click", function () {
+    mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+    try { localStorage.setItem(KEY, mode); } catch (e) {}
+    apply();
+  });
+  apply();
+})();
+</script>
+
+<script>
+if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  });
+}
+</script>
+</body>
+</html>
