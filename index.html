@@ -60,10 +60,7 @@ body {
 h1, h2, h3, p { margin: 0; }
 h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; }
 button { font: inherit; color: inherit; }
-:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
-.skip-link { position: fixed; z-index: 100; top: 8px; left: 8px; transform: translateY(-150%); padding: 12px 16px; border-radius: 10px; background: var(--fill); color: var(--accent-ink); font-weight: 600; text-decoration: none; }
-.skip-link:focus { transform: translateY(0); }
-.sr-only { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 [hidden] { display: none !important; }
 
 .app { width: 100%; max-width: 420px; height: 100%; display: flex; flex-direction: column; background: var(--surface); overflow: hidden; min-width: 0; }
@@ -84,13 +81,13 @@ button { font: inherit; color: inherit; }
 /* início */
 .greet h1 { font-size: 1.7rem; line-height: 1.12; letter-spacing: -.01em; }
 .greet p { color: var(--muted); margin-top: 6px; }
-.search { width: 100%; min-height: 48px; font: 500 1rem var(--font-body); color: var(--fg); background: var(--bg); border: 2px solid var(--fg); border-radius: 12px; padding: 13px 14px; }
+.search { width: 100%; font: 500 1rem var(--font-body); color: var(--fg); background: var(--bg); border: 2px solid var(--fg); border-radius: 12px; padding: 13px 14px; }
 .search::placeholder { color: var(--muted); opacity: 1; }
 .search::placeholder { opacity: 1; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .search::placeholder { color: #ffffff; } }
 :root[data-theme="dark"] .search::placeholder { color: #ffffff; }
 .cats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.cat { min-height: 76px; background: var(--soft); border: 0; border-radius: 12px; padding: 14px 6px 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500; text-align: center; min-width: 0; }
+.cat { background: var(--soft); border: 0; border-radius: 12px; padding: 14px 6px 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500; text-align: center; min-width: 0; }
 .cat svg { width: 28px; height: 28px; color: var(--accent); }
 .cat[aria-pressed="true"] { background: var(--sel-bg); color: var(--sel-ink); }
 .cat[aria-pressed="true"] svg { color: var(--sel-ink); }
@@ -104,9 +101,9 @@ button { font: inherit; color: inherit; }
 .pinfo { padding: 10px 10px 6px; display: flex; flex-direction: column; gap: 8px; }
 .pinfo b { font-weight: 600; font-size: 14px; line-height: 1.25; }
 .pact { padding: 6px 10px 10px; }
-.add { width: 100%; min-height: 44px; background: transparent; color: var(--accent); border: 2px solid var(--accent); border-radius: 10px; font: 600 14px var(--font-body); cursor: pointer; }
+.add { width: 100%; min-height: 38px; background: transparent; color: var(--accent); border: 2px solid var(--accent); border-radius: 10px; font: 600 14px var(--font-body); cursor: pointer; }
 .stepper { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
-.stepper button { width: 44px; height: 44px; flex: none; border: 0; border-radius: 10px; background: var(--fill); color: var(--accent-ink); font: 600 20px/1 var(--font-body); cursor: pointer; }
+.stepper button { width: 38px; height: 38px; flex: none; border: 0; border-radius: 10px; background: var(--fill); color: var(--accent-ink); font: 600 20px/1 var(--font-body); cursor: pointer; }
 .stepper span { font: 600 15px var(--font-body); min-width: 22px; text-align: center; }
 .stepper.big { justify-content: center; gap: 18px; }
 .stepper.big span { font-size: 16px; min-width: 90px; }
@@ -134,7 +131,7 @@ button { font: inherit; color: inherit; }
 .risk.r3 { color: var(--hi); } .risk.r3 .pip:nth-child(-n+3) { background: var(--hi); }
 
 /* item */
-.back { min-height: 44px; align-self: flex-start; background: none; border: 0; padding: 6px 8px 6px 0; display: flex; align-items: center; gap: 4px; color: var(--accent); font-weight: 600; cursor: pointer; }
+.back { align-self: flex-start; background: none; border: 0; padding: 6px 8px 6px 0; display: flex; align-items: center; gap: 4px; color: var(--accent); font-weight: 600; cursor: pointer; }
 .detail h2 { font-size: 1.6rem; line-height: 1.12; margin: 8px 0 10px; }
 .card { background: var(--bg); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
 .card ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
@@ -148,7 +145,7 @@ button { font: inherit; color: inherit; }
 .check input:checked + span { color: var(--muted); text-decoration: line-through; }
 .bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
 .bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s; }
-.x { min-width: 44px; min-height: 44px; background: none; border: 0; color: var(--muted); font-size: 22px; line-height: 1; padding: 4px 8px; cursor: pointer; }
+.x { background: none; border: 0; color: var(--muted); font-size: 22px; line-height: 1; padding: 4px 8px; cursor: pointer; }
 .empty { color: var(--muted); font-size: 14px; }
 .section-title { display: flex; flex-direction: column; gap: 6px; }
 .section-title h2 { font-size: 1.3rem; }
@@ -159,10 +156,10 @@ button { font: inherit; color: inherit; }
 .pt p { color: var(--muted); font-size: 14px; }
 .pt a { color: var(--accent); }
 .status { font-size: 14px; color: var(--muted); }
-.tema { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; font: 500 13px var(--font-body); color: var(--fg); background: transparent; border: 1.5px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; white-space: nowrap; }
+.tema { display: inline-flex; align-items: center; gap: 6px; font: 500 13px var(--font-body); color: var(--fg); background: transparent; border: 1.5px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; white-space: nowrap; }
 .tema:hover { border-color: var(--fg); }
 .tema svg { flex: none; }
-.loc { min-height: 64px; display: flex; align-items: flex-start; gap: 12px; width: 100%; text-align: left; background: var(--bg); border: 2px solid transparent; border-radius: 12px; padding: 14px; cursor: pointer; }
+.loc { display: flex; align-items: flex-start; gap: 12px; width: 100%; text-align: left; background: var(--bg); border: 2px solid transparent; border-radius: 12px; padding: 14px; cursor: pointer; }
 .loc .dot { flex: none; width: 20px; height: 20px; margin-top: 2px; border: 2px solid var(--muted); border-radius: 50%; display: grid; place-items: center; }
 .loc[aria-checked="true"] { border-color: var(--accent); }
 .loc[aria-checked="true"] .dot { border-color: var(--accent); }
@@ -210,25 +207,16 @@ button { font: inherit; color: inherit; }
 .app { position: relative; }
 .toast { position: absolute; left: 12px; right: 12px; bottom: 74px; z-index: 20; background: var(--fg); color: var(--bg); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 6px 24px rgba(0,0,0,.3); font-size: 14px; }
 .toast .row2 { display: flex; gap: 8px; }
-.toast button { flex: 1; min-height: 44px; border-radius: 10px; border: 0; font: 600 14px var(--font-body); cursor: pointer; background: var(--fill); color: var(--accent-ink); }
+.toast button { flex: 1; min-height: 40px; border-radius: 10px; border: 0; font: 600 14px var(--font-body); cursor: pointer; background: var(--fill); color: var(--accent-ink); }
 .toast button.sec { background: transparent; color: var(--bg); border: 1.5px solid var(--bg); flex: none; padding: 0 14px; }
 .greet .intro { color: var(--muted); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .greet .intro { color: #ffffff; } }
 :root[data-theme="dark"] .greet .intro { color: #ffffff; }
-@media (max-width: 359px) {
-  body { padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
-  .screen { padding-left: 12px; padding-right: 12px; gap: 14px; }
-  .cats { gap: 7px; }
-  .cat { padding-left: 4px; padding-right: 4px; font-size: 12px; }
-  .list { gap: 8px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-}
-@media (forced-colors: active) {
-  .cat[aria-pressed="true"], .loc[aria-checked="true"], .btn, .cartbar { border: 2px solid ButtonText; }
-  :focus-visible { outline: 3px solid Highlight; }
-}
+.turnos { display: flex; flex-wrap: wrap; gap: 8px; }
+.turno { flex: 1 1 30%; min-width: 92px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 8px; background: var(--bg); color: var(--fg); border: 2px solid var(--line); border-radius: 12px; cursor: pointer; font: 600 14px var(--font-body); }
+.turno small { font: 500 12px var(--font-body); color: var(--muted); }
+.turno[aria-checked="true"] { border-color: var(--accent); background: var(--soft); }
+.btn.off { opacity: .45; pointer-events: none; }
 .greet-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 </style>
 
@@ -239,7 +227,6 @@ img { max-width: 100%; }
 </style>
 </head>
 <body>
-<a class="skip-link" href="#q">Pular para a pesquisa</a>
 <svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true" focusable="false">
   <defs>
     <clipPath id="m-clip"><rect x="125" y="62" width="150" height="288" rx="60"/></clipPath>
@@ -304,7 +291,7 @@ img { max-width: 100%; }
 </svg>
 <div class="app">
   <!-- INÍCIO -->
-  <section class="screen" id="v-home" role="main" aria-label="Início e catálogo de eletrônicos">
+  <section class="screen" id="v-home">
     <div class="greet">
       <div class="greet-top"><span class="silk">Descarte Certo</span><button id="tema" class="tema" type="button">Tema</button></div>
       <div class="hero"><svg class="mascote" viewBox="0 0 400 400" aria-hidden="true"><use href="#m-wave"/></svg><h1>O que você quer descartar hoje?</h1></div>
@@ -336,7 +323,7 @@ img { max-width: 100%; }
   </section>
 
   <!-- DÚVIDAS -->
-  <section class="screen" id="v-faq" role="main" aria-label="Dúvidas frequentes" hidden>
+  <section class="screen" id="v-faq" hidden>
     <div class="section-title">
       <span class="silk">Descarte Certo</span>
       <h2>Principais dúvidas</h2>
@@ -397,7 +384,7 @@ img { max-width: 100%; }
   </section>
 
   <!-- ITEM -->
-  <section class="screen" id="v-item" role="main" aria-label="Detalhes do eletrônico" hidden>
+  <section class="screen" id="v-item" hidden>
     <button class="back" id="back" type="button">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
       Voltar
@@ -406,7 +393,7 @@ img { max-width: 100%; }
   </section>
 
   <!-- MINHA LISTA -->
-  <section class="screen" id="v-cart" role="main" aria-label="Minha lista de descarte" hidden>
+  <section class="screen" id="v-cart" hidden>
     <button class="back" id="cartback" type="button">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
       Voltar
@@ -426,7 +413,7 @@ img { max-width: 100%; }
   </section>
 
   <!-- MAPA -->
-  <section class="screen" id="v-map" role="main" aria-label="Pontos de entrega" hidden>
+  <section class="screen" id="v-map" hidden>
     <button class="back" id="mapback" type="button" hidden>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
       Voltar
@@ -439,6 +426,11 @@ img { max-width: 100%; }
     </div>
     <div class="stack" id="locais" role="radiogroup" aria-label="Local de entrega"></div>
     <div class="stack" id="loc-actions" hidden>
+      <div class="stack" id="turno-box">
+        <span class="silk">Escolha o turno de entrega</span>
+        <div class="turnos" id="turnos" role="radiogroup" aria-label="Turno de entrega"></div>
+        <p class="status" id="turno-hint" aria-live="polite"></p>
+      </div>
       <span class="silk">O que você quer fazer agora?</span>
       <a id="zap" class="btn" href="#">Combinar entrega pelo WhatsApp</a>
       <button id="copymsg" class="btn ghost" type="button">Se não abrir, copie a mensagem</button>
@@ -453,7 +445,7 @@ img { max-width: 100%; }
 
 
   <div id="zaptoast" class="toast" role="status" hidden>
-    <span id="zaptext">O WhatsApp não abriu? Copie a mensagem e envie para (91) 8813-5217.</span>
+    <span>O WhatsApp não abriu? Copie a mensagem e envie para (91) 8813-5217.</span>
     <div class="row2"><button id="toastcopy" type="button">Copiar mensagem</button><button id="toastclose" class="sec" type="button" aria-label="Fechar aviso">Fechar</button></div>
   </div>
 
@@ -461,7 +453,6 @@ img { max-width: 100%; }
     <span class="n" id="cartbar-n">0</span><span>Minha lista de descarte</span><span class="go">Ver lista ›</span>
   </button>
 
-  <p id="anuncio" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
   <nav class="tabbar" aria-label="Navegação principal">
     <button class="tab" type="button" data-tab="home" aria-current="page">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg>Início
@@ -578,8 +569,6 @@ function setQtd(idx, n) {
   if (n) state.cart[nm] = n; else delete state.cart[nm];
   store("dc-lista", state.cart);
   refreshCart();
-  var aviso = document.getElementById("anuncio");
-  if (aviso) aviso.textContent = n > 0 ? nm + " atualizado: " + n + (n === 1 ? " unidade na lista." : " unidades na lista.") : nm + " removido da lista.";
 }
 function cartList() {
   var out = [];
@@ -617,15 +606,15 @@ function renderCart() {
   document.getElementById("clearcart").hidden = !L.length;
   document.getElementById("addmore").textContent = L.length ? "Adicionar mais itens" : "Escolher itens";
 }
-function msgLista(L) {
+function msgLista(L, T) {
   var linhas = cartList().map(function (c) { return "• " + c.q + "x " + c.it.nome; });
-  return "Olá! Quero combinar a entrega de itens para descarte, pelo app Descarte Certo.\n\nMinha lista (" + plural(cartTotal()) + "):\n" + linhas.join("\n") + "\n\nLocal: " + L.nome + "\n\nQual o melhor dia e horário?";
+  return "Olá! Quero combinar a entrega de itens para descarte, pelo app Descarte Certo.\n\nMinha lista (" + plural(cartTotal()) + "):\n" + linhas.join("\n") + "\n\nLocal: " + L.nome + "\nTurno: " + T.nome + "\n\nPodemos combinar o dia e o horário exato dentro desse turno?";
 }
 function renderDetailAct() {
   var el = document.getElementById("detail-act"); if (!el) return;
   var q = qtd(state.current);
   el.innerHTML = q
-    ? '<div class="stepper big"><button type="button" data-dec aria-label="Diminuir quantidade de ' + esc(ITENS[state.current].nome) + '">−</button><span>' + q + ' na lista</span><button type="button" data-inc aria-label="Aumentar quantidade de ' + esc(ITENS[state.current].nome) + '">+</button></div><button type="button" class="btn" data-act="viewcart">Ver minha lista (' + cartTotal() + ")</button>"
+    ? '<div class="stepper big"><button type="button" data-dec aria-label="Diminuir">−</button><span>' + q + ' na lista</span><button type="button" data-inc aria-label="Aumentar">+</button></div><button type="button" class="btn" data-act="viewcart">Ver minha lista (' + cartTotal() + ")</button>"
     : '<button type="button" class="btn" data-act="add">Adicionar à minha lista</button>';
 }
 
@@ -639,17 +628,7 @@ function go(v) {
     if (t.getAttribute("data-tab") === tab) t.setAttribute("aria-current", "page"); else t.removeAttribute("aria-current");
   });
   var el = document.getElementById("v-" + v);
-  if (el) {
-    el.scrollTop = 0;
-    var titulo = el.querySelector("h1, h2");
-    if (titulo) {
-      titulo.setAttribute("tabindex", "-1");
-      window.setTimeout(function () { titulo.focus({ preventScroll: true }); }, 0);
-    }
-  }
-  var nomes = { home: "Início", faq: "Dúvidas frequentes", item: "Detalhes do eletrônico", cart: "Minha lista de descarte", map: "Pontos de entrega" };
-  var aviso = document.getElementById("anuncio");
-  if (aviso) aviso.textContent = "Tela: " + (nomes[v] || v) + ".";
+  if (el) el.scrollTop = 0;
   if (v === "map") { renderMap(); }
   if (v === "cart") { renderCart(); }
   updateCartBar();
@@ -741,16 +720,19 @@ var LOGO_A = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALgAAAC4CAMAAABn7db1
 document.getElementById("pl-e").src = LOGO_E;
 document.getElementById("pl-a").src = LOGO_A;
 var LOCAIS = [
-  { logo: LOGO_E, cls: "logo-e", nome: "EETEPA - ESCOLA TÉCNICA DE ENSINO DO PARÁ, IRMÃ ALBERTINA LEITÃO", linhas: ["R. Antônio Basílio, 125", "Bairro Novo, Santa Izabel do Pará - PA", "CEP 68790-000", "Horário de entrega: segunda a sexta, das 8h às 11h30 e das 13h às 17h", "Fechado aos sábados, domingos e feriados"],
-    addr: "R. Antônio Basílio, 125 - Bairro Novo, Santa Izabel do Pará - PA, 68790-000", tel: "559188135217" },
+  { logo: LOGO_E, cls: "logo-e", nome: "EETEPA - ESCOLA TÉCNICA DE ENSINO DO PARÁ, IRMÃ ALBERTINA LEITÃO", linhas: ["R. Antônio Basílio, 125", "Bairro Novo, Santa Izabel do Pará - PA", "CEP 68790-000", "Horário de entrega: segunda a sexta, das 8h às 11h30, das 13h às 17h e das 18h às 21h", "Fechado aos sábados, domingos e feriados"],
+    addr: "R. Antônio Basílio, 125 - Bairro Novo, Santa Izabel do Pará - PA, 68790-000" },
   { logo: LOGO_A, cls: "logo-a", nome: "APAE - ASSOCIAÇÃO DE PAIS E AMIGOS DOS EXCEPCIONAIS", linhas: ["R. João Coelho, 625", "Juazeiro", "Horário de entrega: segunda a sexta, das 8h às 11h30", "Fechado aos sábados, domingos e feriados"],
-    addr: "R. João Coelho, 625 - Juazeiro", tel: "559187433285" }
+    addr: "R. João Coelho, 625 - Juazeiro" }
 ];
 /* horários (segunda a sexta), em minutos desde 00:00 */
-LOCAIS[0].hor = [[480, 690], [780, 1020]];
-LOCAIS[1].hor = [[480, 690]];
-/* formata 559187433285 como (91) 8743-3285 (número da APAE) */
-function fmtTel(d) { return "(" + d.slice(2, 4) + ") " + d.slice(4, 8) + "-" + d.slice(8); }
+LOCAIS[0].turnos = [
+  { id: "manha", nome: "Manhã", txt: "8h às 11h30", hor: [480, 690] },
+  { id: "tarde", nome: "Tarde", txt: "13h às 17h", hor: [780, 1020] },
+  { id: "noite", nome: "Noite", txt: "18h às 21h", hor: [1080, 1260] }
+];
+LOCAIS[1].turnos = [{ id: "manha", nome: "Manhã", txt: "8h às 11h30", hor: [480, 690] }];
+LOCAIS.forEach(function (l) { l.hor = l.turnos.map(function (t) { return t.hor; }); });
 var DIAS = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
 function fmtH(m) { var h = Math.floor(m / 60), mm = m % 60; return h + "h" + (mm ? (mm < 10 ? "0" + mm : mm) : ""); }
 /* feriados em que os locais ficam fechados: nacionais + estadual do Pará (15 de agosto) */
@@ -815,7 +797,7 @@ function statusLocal(hor) {
   }
   return { aberto: false, txt: fer ? "Fechado hoje por causa do feriado: " + fer : "Fechado agora" };
 }
-function startMap() { state.picking = true; state.loc = -1; go("map"); }
+function startMap() { state.picking = true; state.loc = -1; state.turno = ""; go("map"); }
 function renderMap() {
   var picking = state.picking && cartTotal() > 0;
   if (!picking) state.loc = 0;
@@ -832,10 +814,17 @@ function renderMap() {
   var L = LOCAIS[state.loc];
   document.getElementById("loc-actions").hidden = !L;
   if (L) {
-    var txt = picking ? msgLista(L) : "Olá! Quero entregar um aparelho eletrônico na " + L.nome + ". Qual o melhor dia e horário?";
+    var T = L.turnos.filter(function (t) { return t.id === state.turno; })[0] || null;
+    document.getElementById("turnos").innerHTML = L.turnos.map(function (t) {
+      return '<button type="button" class="turno" role="radio" data-t="' + t.id + '" aria-checked="' + (T && T.id === t.id ? "true" : "false") + '">' + esc(t.nome) + "<small>" + esc(t.txt) + "</small></button>";
+    }).join("");
+    document.getElementById("turno-hint").textContent = T ? "" : "Escolha um turno para enviar sua mensagem.";
     var z = document.getElementById("zap");
+    var txt = T ? (picking ? msgLista(L, T) : "Olá! Quero entregar um aparelho eletrônico na " + L.nome + ".\nTurno: " + T.nome + "\n\nPodemos combinar o dia e o horário exato dentro desse turno?") : "";
     state.lastMsg = txt;
-    z.href = "https://wa.me/" + L.tel + "?text=" + encodeURIComponent(txt);
+    document.getElementById("copymsg").hidden = !T;
+    if (T) { z.setAttribute("href", "https://wa.me/559188135217?text=" + encodeURIComponent(txt)); z.classList.remove("off"); z.removeAttribute("aria-disabled"); }
+    else { z.removeAttribute("href"); z.classList.add("off"); z.setAttribute("aria-disabled", "true"); }
     z.textContent = picking ? "Enviar minha lista pelo WhatsApp" : "Combinar entrega pelo WhatsApp";
     document.getElementById("copymsg-ok").hidden = true;
     document.getElementById("compart").hidden = !navigator.share;
@@ -843,45 +832,32 @@ function renderMap() {
   }
   document.getElementById("copiado").hidden = true;
 }
-function selecionarLocal(indice) {
-  if (indice < 0 || indice >= LOCAIS.length) return;
-  state.loc = indice;
-  renderMap();
-  var opcoes = document.querySelectorAll("#locais .loc");
-  if (opcoes[indice]) opcoes[indice].focus();
-  var aviso = document.getElementById("anuncio");
-  if (aviso) aviso.textContent = "Ponto selecionado: " + LOCAIS[indice].nome + ".";
-}
 document.getElementById("locais").addEventListener("click", function (e) {
   var b = e.target.closest(".loc"); if (!b) return;
-  selecionarLocal(parseInt(b.getAttribute("data-loc"), 10));
+  var n = parseInt(b.getAttribute("data-loc"), 10);
+  if (n !== state.loc) { state.loc = n; state.turno = LOCAIS[n].turnos.length === 1 ? LOCAIS[n].turnos[0].id : ""; }
+  renderMap();
 });
-document.getElementById("locais").addEventListener("keydown", function (e) {
-  var b = e.target.closest(".loc"); if (!b) return;
-  var atual = parseInt(b.getAttribute("data-loc"), 10);
-  if (e.key === "ArrowDown" || e.key === "ArrowRight") { e.preventDefault(); selecionarLocal((atual + 1) % LOCAIS.length); }
-  else if (e.key === "ArrowUp" || e.key === "ArrowLeft") { e.preventDefault(); selecionarLocal((atual - 1 + LOCAIS.length) % LOCAIS.length); }
-  else if (e.key === "Home") { e.preventDefault(); selecionarLocal(0); }
-  else if (e.key === "End") { e.preventDefault(); selecionarLocal(LOCAIS.length - 1); }
+document.getElementById("turnos").addEventListener("click", function (e) {
+  var b = e.target.closest(".turno"); if (!b) return;
+  state.turno = b.getAttribute("data-t");
+  renderMap();
 });
 document.getElementById("mapback").addEventListener("click", function () { go("cart"); });
 document.getElementById("verdet").addEventListener("click", function () { go("cart"); });
 document.getElementById("compart").addEventListener("click", function () {
   var L = LOCAIS[state.loc]; if (!L) return;
-  var t = (state.picking && cartTotal() ? "Descarte de " + cartList().map(function (c) { return c.q + "x " + c.it.nome; }).join(", ") + " em: " : "Ponto de entrega: ") + L.nome + " - " + L.addr;
+  var t = (state.picking && cartTotal() ? "Descarte de " + cartList().map(function (c) { return c.q + "x " + c.it.nome; }).join(", ") + " em: " : "Ponto de entrega: ") + L.nome + (state.turno ? " (turno: " + (L.turnos.filter(function (t) { return t.id === state.turno; })[0] || { nome: "" }).nome.toLowerCase() + ")" : "") + " - " + L.addr;
   try { navigator.share({ title: "Descarte Certo", text: t }).catch(function () {}); } catch (e) {}
 });
 
 /* aviso quando o WhatsApp não abre (ex.: arquivo aberto na prévia do iPhone) */
-var zapTimer = null, zapMsg = "", zapNum = "(91) 8813-5217";
+var zapTimer = null, zapMsg = "";
 function hideToast() { clearTimeout(zapTimer); document.getElementById("zaptoast").hidden = true; }
 document.addEventListener("click", function (e) {
   var a = e.target.closest && e.target.closest('a[href^="https://wa.me/"]'); if (!a) return;
   var m = a.getAttribute("href").match(/[?&]text=([^&]*)/);
   try { zapMsg = m ? decodeURIComponent(m[1]) : ""; } catch (x) { zapMsg = ""; }
-  var dn = a.getAttribute("href").match(/wa\.me\/(\d{12,13})/);
-  if (dn) zapNum = fmtTel(dn[1]);
-  document.getElementById("zaptext").textContent = "O WhatsApp não abriu? Copie a mensagem e envie para " + zapNum + ".";
   clearTimeout(zapTimer);
   zapTimer = setTimeout(function () {
     if (document.visibilityState === "visible") document.getElementById("zaptoast").hidden = false;
@@ -948,8 +924,7 @@ document.getElementById("copiar").addEventListener("click", function () {
 });
 document.getElementById("copymsg").addEventListener("click", function () {
   if (!state.lastMsg) return;
-  var Lm = LOCAIS[state.loc], num = fmtTel(Lm ? Lm.tel : "559188135217");
-  copyText(state.lastMsg, function () { sayIn("copymsg-ok", "Mensagem copiada. Abra o WhatsApp, procure o número " + num + " e cole."); }, function () { sayIn("copymsg-ok", "Não foi possível copiar. Mande a lista manualmente para " + num + "."); });
+  copyText(state.lastMsg, function () { sayIn("copymsg-ok", "Mensagem copiada. Abra o WhatsApp, procure o número (91) 8813-5217 e cole."); }, function () { sayIn("copymsg-ok", "Não foi possível copiar. Mande a lista manualmente para (91) 8813-5217."); });
 });
 document.getElementById("copynum").addEventListener("click", function () {
   copyText("(91) 8813-5217", function () { sayIn("copynum-ok", "Número copiado. Abra o WhatsApp e cole na busca de contatos."); }, function () { sayIn("copynum-ok", "Não foi possível copiar. O número é (91) 8813-5217."); });

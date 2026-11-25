@@ -1,7 +1,7 @@
 /* Descarte Certo: service worker.
    Guarda o app no aparelho para abrir sem internet depois da primeira visita.
    Quando alterar o index.html, troque o número em VERSAO para os celulares receberem a atualização. */
-var VERSAO = "dc-v4";
+var VERSAO = "dc-v3";
 var ARQUIVOS = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", function (e) {
