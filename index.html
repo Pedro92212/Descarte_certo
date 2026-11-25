@@ -445,7 +445,7 @@ img { max-width: 100%; }
 
 
   <div id="zaptoast" class="toast" role="status" hidden>
-    <span>O WhatsApp não abriu? Copie a mensagem e envie para (91) 8813-5217.</span>
+    <span>O WhatsApp não abriu? Copie a mensagem e envie para <b id="toastnum">(91) 8813-5217</b>.</span>
     <div class="row2"><button id="toastcopy" type="button">Copiar mensagem</button><button id="toastclose" class="sec" type="button" aria-label="Fechar aviso">Fechar</button></div>
   </div>
 
@@ -733,6 +733,15 @@ LOCAIS[0].turnos = [
 ];
 LOCAIS[1].turnos = [{ id: "manha", nome: "Manhã", txt: "8h às 11h30", hor: [480, 690] }];
 LOCAIS.forEach(function (l) { l.hor = l.turnos.map(function (t) { return t.hor; }); });
+/* WhatsApp de cada ponto de entrega (código do país + DDD + número) */
+LOCAIS[0].wa = "559188135217";
+LOCAIS[1].wa = "5591987433285";
+function fmtFone(n) {
+  n = String(n).replace(/\D/g, "");
+  if (n.indexOf("55") === 0) n = n.slice(2);
+  var ddd = n.slice(0, 2), r = n.slice(2);
+  return "(" + ddd + ") " + (r.length === 9 ? r.slice(0, 5) + "-" + r.slice(5) : r.slice(0, 4) + "-" + r.slice(4));
+}
 var DIAS = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
 function fmtH(m) { var h = Math.floor(m / 60), mm = m % 60; return h + "h" + (mm ? (mm < 10 ? "0" + mm : mm) : ""); }
 /* feriados em que os locais ficam fechados: nacionais + estadual do Pará (15 de agosto) */
@@ -823,7 +832,7 @@ function renderMap() {
     var txt = T ? (picking ? msgLista(L, T) : "Olá! Quero entregar um aparelho eletrônico na " + L.nome + ".\nTurno: " + T.nome + "\n\nPodemos combinar o dia e o horário exato dentro desse turno?") : "";
     state.lastMsg = txt;
     document.getElementById("copymsg").hidden = !T;
-    if (T) { z.setAttribute("href", "https://wa.me/559188135217?text=" + encodeURIComponent(txt)); z.classList.remove("off"); z.removeAttribute("aria-disabled"); }
+    if (T) { z.setAttribute("href", "https://wa.me/" + L.wa + "?text=" + encodeURIComponent(txt)); z.classList.remove("off"); z.removeAttribute("aria-disabled"); }
     else { z.removeAttribute("href"); z.classList.add("off"); z.setAttribute("aria-disabled", "true"); }
     z.textContent = picking ? "Enviar minha lista pelo WhatsApp" : "Combinar entrega pelo WhatsApp";
     document.getElementById("copymsg-ok").hidden = true;
@@ -852,12 +861,15 @@ document.getElementById("compart").addEventListener("click", function () {
 });
 
 /* aviso quando o WhatsApp não abre (ex.: arquivo aberto na prévia do iPhone) */
-var zapTimer = null, zapMsg = "";
+var zapTimer = null, zapMsg = "", zapNum = "(91) 8813-5217";
 function hideToast() { clearTimeout(zapTimer); document.getElementById("zaptoast").hidden = true; }
 document.addEventListener("click", function (e) {
   var a = e.target.closest && e.target.closest('a[href^="https://wa.me/"]'); if (!a) return;
   var m = a.getAttribute("href").match(/[?&]text=([^&]*)/);
   try { zapMsg = m ? decodeURIComponent(m[1]) : ""; } catch (x) { zapMsg = ""; }
+  var mn = a.getAttribute("href").match(/wa\.me\/(\d+)/);
+  zapNum = mn ? fmtFone(mn[1]) : "(91) 8813-5217";
+  document.getElementById("toastnum").textContent = zapNum;
   clearTimeout(zapTimer);
   zapTimer = setTimeout(function () {
     if (document.visibilityState === "visible") document.getElementById("zaptoast").hidden = false;
@@ -868,7 +880,7 @@ window.addEventListener("pagehide", hideToast);
 document.getElementById("toastclose").addEventListener("click", hideToast);
 document.getElementById("toastcopy").addEventListener("click", function () {
   var b = this;
-  copyText(zapMsg || "(91) 8813-5217", function () { b.textContent = "Copiado!"; setTimeout(function () { b.textContent = "Copiar mensagem"; }, 2500); }, function () { b.textContent = "Não foi possível copiar"; });
+  copyText(zapMsg || zapNum, function () { b.textContent = "Copiado!"; setTimeout(function () { b.textContent = "Copiar mensagem"; }, 2500); }, function () { b.textContent = "Não foi possível copiar"; });
 });
 
 /* minha lista: ações */
@@ -923,8 +935,10 @@ document.getElementById("copiar").addEventListener("click", function () {
   copyText(L.addr, function () { sayIn("copiado", "Endereço copiado."); }, function () { sayIn("copiado", "Não foi possível copiar. Selecione o endereço acima e copie."); });
 });
 document.getElementById("copymsg").addEventListener("click", function () {
-  if (!state.lastMsg) return;
-  copyText(state.lastMsg, function () { sayIn("copymsg-ok", "Mensagem copiada. Abra o WhatsApp, procure o número (91) 8813-5217 e cole."); }, function () { sayIn("copymsg-ok", "Não foi possível copiar. Mande a lista manualmente para (91) 8813-5217."); });
+  var L = LOCAIS[state.loc];
+  if (!state.lastMsg || !L) return;
+  var num = fmtFone(L.wa);
+  copyText(state.lastMsg, function () { sayIn("copymsg-ok", "Mensagem copiada. Abra o WhatsApp, procure o número " + num + " e cole."); }, function () { sayIn("copymsg-ok", "Não foi possível copiar. Mande a lista manualmente para " + num + "."); });
 });
 document.getElementById("copynum").addEventListener("click", function () {
   copyText("(91) 8813-5217", function () { sayIn("copynum-ok", "Número copiado. Abra o WhatsApp e cole na busca de contatos."); }, function () { sayIn("copynum-ok", "Não foi possível copiar. O número é (91) 8813-5217."); });
